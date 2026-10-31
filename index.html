@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flavio RUDI - Business Analytics & Strategy</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- D3.js & TopoJSON -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            bg: '#09090b',       // Zinc 950
+                            card: '#18181b',     // Zinc 900
+                            cardhover: '#27272a',// Zinc 800
+                            border: '#27272a',   // Zinc 800
+                            accent: '#ffffff',
+                            accentSoft: '#e4e4e7',// Zinc 200
+                            text: '#a1a1aa',     // Zinc 400
+                            title: '#fafafa',    // Zinc 50
+                            blue: '#3b82f6'      // Blue for the bouncing dot
+                        }
+                    },
+                    transitionTimingFunction: {
+                        'motion': 'cubic-bezier(0.23, 1, 0.32, 1)', // Smooth motion
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #09090b;
+            color: #a1a1aa;
+            background-image: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+        }
+
+        .minimal-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 1.5rem;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .minimal-card:hover {
+            border-color: #3f3f46;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+        
+        .section-tag {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #e4e4e7;
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 9999px;
+        }
+
+        .btn-primary {
+            background-color: #fafafa;
+            color: #09090b;
+            font-weight: 600;
+            border-radius: 9999px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .btn-primary:hover {
+            transform: scale(1.03);
+            background-color: #ffffff;
+            box-shadow: 0 10px 25px rgba(255,255,255,0.1);
+        }
+        
+        .btn-outline {
+            border: 1px solid #3f3f46;
+            color: #fafafa;
+            border-radius: 9999px;
+            background: transparent;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .btn-outline:hover {
+            border-color: #fafafa;
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.03);
+        }
+
+        .hero-card-stage { position: relative; width: 100%; max-width: 560px; height: 440px; margin: 2.5rem auto 0; isolation: isolate; perspective: 1000px; }
+        .hero-card { position: absolute; display: flex; flex-direction: column; width: min(58%, 270px); min-height: 310px; overflow: hidden; text-decoration: none; color: inherit; border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; background: #121214; box-shadow: 0 20px 40px rgba(0,0,0,0.4); transform-origin: center center; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        .hero-card::after { content: "→"; position: absolute; right: 16px; bottom: 16px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: #09090b; background: #fafafa; font-size: 14px; font-weight: bold; opacity: 0; transform: scale(0.8) translate(-10px, 10px); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        
+        /* The most important z-index fix for hover */
+        .hero-card:hover, .hero-card:focus-visible, .hero-card.is-active { z-index: 50 !important; border-color: rgba(255,255,255,0.3); box-shadow: 0 30px 60px rgba(0,0,0,0.6); transform: translateY(-16px) rotate(0deg) scale(1.05); outline: none; }
+        .hero-card:hover::after, .hero-card:focus-visible::after { opacity: 1; transform: scale(1) translate(0, 0); }
+        
+        .hero-card--about { top: 40px; left: 6%; z-index: 3; transform: rotate(-5deg); }
+        .hero-card--project1 { top: 15px; left: 45%; z-index: 2; transform: rotate(4deg); }
+        .hero-card--project2 { top: 100px; left: 24%; z-index: 1; transform: rotate(-2deg); }
+        
+        .hero-card-art { height: 160px; flex-shrink: 0; position: relative; overflow: hidden; }
+        .art-about { background: linear-gradient(135deg, #a1a1aa 0%, #3f3f46 100%); }
+        .art-data { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .art-marketing { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
+        .art-strategy { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+        /* Opacité réduite de 0.8 à 0.2 pour que les images soient parfaitement visibles */
+        .hero-card-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #121214); opacity: 0.2; }
+
+        .hero-card-copy { padding: 20px 20px 48px; position: relative; z-index: 2; }
+        .hero-card-label { font: 11px 'Inter',sans-serif; font-weight: 600; color:#e4e4e7; letter-spacing:0.05em; text-transform:uppercase; opacity: 0.7;}
+        .hero-card-title { margin-top:8px; color:#fafafa; font-size:18px; line-height:1.25; font-weight:600; }
+        .hero-card-description { margin-top:8px; color:#a1a1aa; font-size:13px; line-height:1.5; }
+
+        /* Responsive breakpoints */
+        @media (max-width: 1023px) { .hero-card-stage { max-width:520px; height:410px; margin-top:1.25rem; } .hero-card { width:min(52%,250px); min-height:285px; } .hero-card-art {height:140px;} .hero-card--about{left:6%;top:30px}.hero-card--project1{left:46%;top:10px}.hero-card--project2{left:25%;top:90px} }
+        @media (max-width: 520px) { .hero-card-stage { height:auto; max-width:100%; margin-top:2rem; display:flex; flex-direction:column; gap:16px; perspective:none; } .hero-card { position:relative; width:100%; min-height:220px; transform:none !important; border-radius:20px; left:0!important; top:0!important; } .hero-card:hover, .hero-card:focus-visible, .hero-card.is-active { transform: translateY(-4px)!important; box-shadow: 0 15px 30px rgba(0,0,0,0.3); } .hero-card-art {height:100px;} .hero-card-copy {padding:16px 16px 32px;} .hero-card::after{right:12px;bottom:12px;} }
+        @media (prefers-reduced-motion: reduce) { * { transition:none !important; transform:none !important; } }
+
+        @media (pointer: fine) {
+            body, a, button, .cursor-pointer, .hero-card, .exp-tab { cursor: none !important; }
+            .magic-cursor { 
+                position: fixed; 
+                top: 0; left: 0; 
+                width: 12px; height: 12px; 
+                background: #ffffff; 
+                border-radius: 50%; 
+                z-index: 99999; 
+                pointer-events: none; 
+                mix-blend-mode: difference; 
+                opacity: 0; 
+                transition: width 0.3s cubic-bezier(0.23, 1, 0.32, 1), height 0.3s cubic-bezier(0.23, 1, 0.32, 1); 
+            }
+            .magic-cursor.hovering {
+                width: 40px; height: 40px;
+            }
+        }
+
+        /* Animations d'apparition de la page A Propos */
+        .animate-on-show { opacity: 0; animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Nouvelles animations très motion design */
+        .text-reveal { opacity: 0; animation: smoothReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes smoothReveal {
+            0% { opacity: 0; transform: translateY(40px); filter: blur(8px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0px); }
+        }
+        
+        .bar-grow { transform-origin: left; transform: scaleX(0); animation: scaleXUp 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+        @keyframes scaleXUp {
+            to { transform: scaleX(1); }
+        }
+        
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-400 { animation-delay: 400ms; }
+        .delay-500 { animation-delay: 500ms; }
+        .delay-600 { animation-delay: 600ms; }
+
+        /* ===== Intro motion design ===== */
+        #intro-loader { position: fixed; inset: 0; z-index: 100000; background: #09090b; display: flex; align-items: center; justify-content: center; will-change: transform; }
+        #intro-curtain { position: fixed; inset: 0; z-index: 99990; background: #3b82f6; pointer-events: none; will-change: transform; }
+        /* bord supérieur arrondi des rideaux (bord d'attaque quand ils descendent) */
+        #intro-loader::before, #intro-curtain::before { content: ''; position: absolute; left: -12%; right: -12%; bottom: 100%; height: 14vh; background: inherit; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+        .intro-text { display: flex; align-items: center; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 2.25rem; line-height: 1; letter-spacing: -0.025em; color: #fafafa; will-change: transform, opacity, filter; }
+        @media (min-width: 768px) { .intro-text { font-size: 3.75rem; } }
+        .intro-letter { display: inline-block; overflow: hidden; padding: .14em .02em; margin: -.14em -.02em; }
+        .intro-letter.intro-gap { margin-left: calc(.3em - .02em); }
+        .intro-letter > span { display: inline-block; transform: translateY(105%); opacity: 0; will-change: transform, opacity, filter; }
+        #bouncing-dot { position: fixed; top: 0; left: 0; width: 12px; height: 12px; z-index: 100001; pointer-events: none; will-change: transform; }
+        #bouncing-dot .dot-y, #bouncing-dot .dot-body { display: block; width: 100%; height: 100%; }
+        #bouncing-dot .dot-y { will-change: transform; }
+        #bouncing-dot .dot-body { border-radius: 50%; background: #3b82f6; box-shadow: 0 0 24px rgba(59,130,246,.55); transform-origin: 50% 100%; opacity: 0; will-change: transform; }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden relative">
+
+    <!-- Intro : texte + point rebondissant, puis double rideau (bleu puis sombre) -->
+    <div id="intro-curtain" aria-hidden="true"></div>
+    <div id="intro-loader" aria-hidden="true">
+        <div class="intro-text">
+            <!-- ı sans point (U+0131) : le point bleu est animé en JS -->
+            <span class="intro-letter"><span>F</span></span>
+            <span class="intro-letter"><span>l</span></span>
+            <span class="intro-letter"><span>a</span></span>
+            <span class="intro-letter"><span>v</span></span>
+            <span id="intro-i1" class="intro-letter"><span>ı</span></span>
+            <span class="intro-letter"><span>o</span></span>
+            <span class="intro-letter intro-gap"><span>R</span></span>
+            <span class="intro-letter"><span>u</span></span>
+            <span class="intro-letter"><span>d</span></span>
+            <span id="intro-i2" class="intro-letter"><span>ı</span></span>
+        </div>
+    </div>
+    <div id="bouncing-dot" aria-hidden="true"><span class="dot-y"><span class="dot-body"></span></span></div>
+
+    <!-- Custom Cursor Element -->
+    <div id="magic-cursor" class="magic-cursor hidden md:block"></div>
+    <div id="cursor-tooltip" class="fixed top-0 left-0 pointer-events-none z-[100000] bg-white text-black text-[11px] font-bold px-3 py-1.5 rounded-full opacity-0 transition-opacity duration-200 transform translate-y-6 -translate-x-1/2 hidden md:block tracking-wide whitespace-nowrap shadow-lg"></div>
+
+    <div id="app-root">
+        <!-- VIEW: ACCUEIL -->
+        <div id="view-home" class="spa-view block">
+            
+            <nav class="fixed w-full top-0 z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-brand-border/50 transition-all duration-300">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-20 items-center">
+                        <div class="flex-shrink-0 flex items-center cursor-pointer" data-tooltip="Haut de page" onclick="window.scrollTo(0,0)">
+                            <span class="text-white font-bold text-xl tracking-tight bg-white text-black px-2 py-1 rounded-md">FR.</span>
+                        </div>
+                        <div class="hidden md:flex space-x-8 text-sm font-medium text-brand-text">
+                            <a href="#experience" class="hover:text-brand-title transition-colors" data-tooltip="Aller à la section Parcours">Parcours</a>
+                            <a href="#skills" class="hover:text-brand-title transition-colors" data-tooltip="Aller à la section Compétences">Compétences</a>
+                            <a href="#" onclick="navigateTo('view-projects'); return false;" class="hover:text-brand-title transition-colors" data-tooltip="Découvrir mes projets">Projets</a>
+                            <a href="#contact" class="hover:text-brand-title transition-colors" data-tooltip="Aller à la section Contact">Contact</a>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button id="data-mode-toggle" class="flex items-center gap-2 text-xs font-medium text-brand-text hover:text-brand-title transition-colors px-3 py-1.5 rounded-full hover:bg-brand-border" data-tooltip="Ouvrir la télémétrie">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Télémétrie
+                            </button>
+                            <a href="#contact" class="btn-primary px-5 py-2.5 text-sm" data-tooltip="Me contacter">Me contacter</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <main class="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[90vh] flex flex-col justify-center">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    
+                    <div class="max-w-2xl">
+                        <div class="flex flex-wrap gap-2 mb-8">
+                            <span class="px-3 py-1 bg-white text-black rounded-full text-xs font-semibold uppercase tracking-wide">Recherche de stage</span>
+                            <span class="px-3 py-1 bg-brand-border text-brand-text rounded-full text-xs font-medium uppercase tracking-wide">Business Analytics</span>
+                        </div>
+                        
+                        <!-- Hero Title with the target dot for the animation -->
+                        <h1 class="text-5xl md:text-7xl font-bold text-brand-title mb-6 tracking-tight leading-[1.1]">
+                            Flavio RUDI<span id="hero-dot" class="opacity-0 text-brand-blue">.</span>
+                        </h1>
+                        
+                        <p class="text-xl md:text-2xl font-medium text-brand-text mb-6 leading-snug">
+                            Connecter les <span class="text-white">données</span> à la <span class="text-white">stratégie d'entreprise</span>.
+                        </p>
+                        
+                        <p class="text-base text-brand-text mb-10 max-w-lg leading-relaxed">
+                            Étudiant en troisième année du BUT Techniques de Commercialisation, je recherche un stage pour transformer vos données en recommandations concrètes.
+                        </p>
+                        
+                        <div class="flex flex-wrap gap-4 mb-12">
+                            <a href="#experience" class="btn-primary px-7 py-3.5 flex items-center gap-2" data-tooltip="Découvrir mes expériences">
+                                Explorer mon parcours 
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                            </a>
+                            <a href="#contact" class="btn-outline px-7 py-3.5 flex items-center gap-2" data-tooltip="Aller à la section Contact">
+                                Me contacter
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center items-center relative w-full min-w-0 flex-col">
+                        <p class="text-xs text-brand-text font-medium uppercase tracking-widest mb-6 flex items-center gap-2 opacity-80">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                            Cliquez sur les cartes pour explorer
+                        </p>
+                        
+                        <div class="hero-card-stage" aria-label="Cartes interactives du portfolio">
+                            <a class="hero-card hero-card--about" href="#" tabindex="0" onclick="navigateTo('view-about'); return false;" aria-label="Découvrir ma page À propos">
+                                <div class="hero-card-art art-about">
+                                    <img src="ChatGPT Image 4 févr. 2026, 16_46_43_upscayl_2x_upscayl-standard-4x.jpg" alt="Image Profil" class="absolute inset-0 w-full h-full object-cover object-center z-10">
+                                </div>
+                                <div class="hero-card-copy">
+                                    <div class="hero-card-label">01 · Profil</div>
+                                    <h2 class="hero-card-title">Qui suis-je ?</h2>
+                                    <p class="hero-card-description">Mon parcours, ma personnalité et ce qui m'anime.</p>
+                                </div>
+                            </a>
+                            <a class="hero-card hero-card--project1" href="#" tabindex="0" onclick="navigateTo('view-projects'); return false;" aria-label="Découvrir les projets universitaires">
+                                <div class="hero-card-art art-data">
+                                    <img src="Capture d'écran 2026-10-20 090918.png" alt="Image Zentorno" class="absolute inset-0 w-full h-full object-cover object-center z-10">
+                                </div>
+                                <div class="hero-card-copy">
+                                    <div class="hero-card-label">02 · Universitaire</div>
+                                    <h2 class="hero-card-title">Projet Zentorno</h2>
+                                    <p class="hero-card-description">SAE (Situation d'Apprentissage et d'Évaluation) Jeux de simulation d'entreprise.</p>
+                                </div>
+                            </a>
+                            <a class="hero-card hero-card--project2" href="#" tabindex="0" onclick="navigateTo('view-projects'); return false;" aria-label="Découvrir les projets marketing">
+                                <div class="hero-card-art art-marketing bg-[#121214] flex items-center justify-center relative">
+                                    <div class="absolute inset-0 bg-brand-blue/10"></div>
+                                    <span class="z-10 font-bold text-brand-blue tracking-widest text-lg">PIN THE LOCATION</span>
+                                </div>
+                                <div class="hero-card-copy">
+                                    <div class="hero-card-label">03 · Personnel</div>
+                                    <h2 class="hero-card-title">PinTheLocation</h2>
+                                    <p class="hero-card-description">Conception d'un jeu de géographie quotidien.</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <section class="py-24 border-t border-brand-border/30">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="mb-12">
+                        <span class="section-tag mb-4">Vue d'ensemble</span>
+                        <h2 class="text-3xl font-bold text-brand-title">Indicateurs clés</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="minimal-card p-8">
+                            <div class="text-xs font-semibold text-brand-text uppercase tracking-wider mb-4">Expériences Pro</div>
+                            <div class="text-5xl font-bold text-white mb-4">3+</div>
+                            <div class="text-sm text-brand-text leading-relaxed">Boutique, secteur public, marketing digital et logistique.</div>
+                        </div>
+                        <div class="minimal-card p-8">
+                            <div class="text-xs font-semibold text-brand-text uppercase tracking-wider mb-4">Progression</div>
+                            <div class="text-4xl font-bold text-white mb-4">2024<span class="text-brand-border mx-2">&rarr;</span>2026</div>
+                            <div class="text-sm text-brand-text leading-relaxed">Une évolution cohérente et continue sur trois ans.</div>
+                        </div>
+                        <div class="minimal-card p-8">
+                            <div class="text-xs font-semibold text-brand-text uppercase tracking-wider mb-4">Anglais</div>
+                            <div class="text-5xl font-bold text-white mb-4">C1</div>
+                            <div class="text-sm text-brand-text leading-relaxed">Niveau de maîtrise déclaré, usage fluide.</div>
+                        </div>
+                        <div class="minimal-card p-8 bg-white/5 border-white/10">
+                            <div class="text-xs font-semibold text-brand-title uppercase tracking-wider mb-4 flex justify-between items-center">
+                                Certification
+                                <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                            </div>
+                            <div class="text-3xl font-bold text-white mb-4">Power BI</div>
+                            <div class="text-sm text-brand-text leading-relaxed">Formation en cours d'acquisition.</div>
+                        </div>
+                        <div class="minimal-card p-8">
+                            <div class="text-xs font-semibold text-brand-text uppercase tracking-wider mb-4">Expertise Outil</div>
+                            <div class="text-2xl font-bold text-white mb-4">Google Analytics</div>
+                            <div class="text-sm text-brand-text leading-relaxed">Lecture et interprétation fine de la performance web.</div>
+                        </div>
+                        <div class="minimal-card p-8">
+                            <div class="text-xs font-semibold text-brand-text uppercase tracking-wider mb-4">Expertise Outil</div>
+                            <div class="text-2xl font-bold text-white mb-4">Search Console</div>
+                            <div class="text-sm text-brand-text leading-relaxed">Analyse de visibilité et référencement naturel.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="experience" class="py-24 border-t border-brand-border/30">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="mb-16">
+                        <span class="section-tag mb-4">Parcours</span>
+                        <h2 class="text-3xl md:text-4xl font-bold text-brand-title mb-4">Expériences Professionnelles</h2>
+                        <p class="text-sm text-brand-text flex items-center gap-2 mt-4 opacity-80">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                            Sélectionnez une expérience ci-dessous pour en afficher les détails.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row gap-16">
+                        <!-- Timeline List -->
+                        <div class="w-full lg:w-1/3 space-y-2 relative">
+                            <div class="absolute left-4 top-4 bottom-4 w-px bg-brand-border z-0"></div>
+                            
+                            <button class="exp-tab w-full text-left relative group cursor-pointer p-4 rounded-xl transition-all duration-300 hover:bg-white/5 opacity-60 hover:opacity-100" data-target="exp-mairie">
+                                <div class="absolute left-[11px] top-[26px] w-2.5 h-2.5 rounded-full bg-brand-border ring-4 ring-[#09090b] z-10 transition-colors group-hover:bg-brand-text"></div>
+                                <div class="ml-8">
+                                    <div class="text-sm font-medium text-brand-text mb-1">Sept. 2026 - Aujourd'hui</div>
+                                    <div class="font-bold text-white text-lg">Mairie de Cannes</div>
+                                    <div class="text-sm text-brand-text mt-1">Adjoint territorial</div>
+                                </div>
+                            </button>
+
+                            <button class="exp-tab w-full text-left relative group cursor-pointer p-4 rounded-xl transition-all duration-300 hover:bg-white/5 opacity-60 hover:opacity-100" data-target="exp-metro">
+                                <div class="absolute left-[11px] top-[26px] w-2.5 h-2.5 rounded-full bg-brand-border ring-4 ring-[#09090b] z-10 transition-colors group-hover:bg-brand-text"></div>
+                                <div class="ml-8">
+                                    <div class="text-sm font-medium text-brand-text mb-1">Août 2026</div>
+                                    <div class="font-bold text-white text-lg">METRO France</div>
+                                    <div class="text-sm text-brand-text mt-1">Préparateur de commandes</div>
+                                </div>
+                            </button>
+
+                            <button class="exp-tab w-full text-left relative group cursor-pointer p-4 rounded-xl transition-all duration-300 hover:bg-white/5 opacity-100" data-target="exp-opale">
+                                <div class="absolute left-[11px] top-[26px] w-2.5 h-2.5 rounded-full bg-brand-title ring-4 ring-[#09090b] z-10 transition-transform group-hover:scale-125"></div>
+                                <div class="ml-8">
+                                    <div class="text-sm font-medium text-white mb-1 flex items-center gap-2">
+                                        Avr. - Mai 2026 <span class="px-2 py-0.5 bg-white text-black rounded-full text-[10px] font-bold">FOCUS</span>
+                                    </div>
+                                    <div class="font-bold text-white text-lg">Opale Marine</div>
+                                    <div class="text-sm text-brand-text mt-1">Stagiaire marketing</div>
+                                </div>
+                            </button>
+                            
+                            <button class="exp-tab w-full text-left relative group cursor-pointer p-4 rounded-xl transition-all duration-300 hover:bg-white/5 opacity-60 hover:opacity-100" data-target="exp-dgfip">
+                                <div class="absolute left-[11px] top-[26px] w-2.5 h-2.5 rounded-full bg-brand-border ring-4 ring-[#09090b] z-10 transition-colors group-hover:bg-brand-text"></div>
+                                <div class="ml-8">
+                                    <div class="text-sm font-medium text-brand-text mb-1">Juillet 2025</div>
+                                    <div class="font-bold text-white text-lg">DGFiP</div>
+                                    <div class="text-sm text-brand-text mt-1">Comptable vacataire</div>
+                                </div>
+                            </button>
+                            
+                            <button class="exp-tab w-full text-left relative group cursor-pointer p-4 rounded-xl transition-all duration-300 hover:bg-white/5 opacity-60 hover:opacity-100" data-target="exp-nespresso">
+                                <div class="absolute left-[11px] top-[26px] w-2.5 h-2.5 rounded-full bg-brand-border ring-4 ring-[#09090b] z-10 transition-colors group-hover:bg-brand-text"></div>
+                                <div class="ml-8">
+                                    <div class="text-sm font-medium text-brand-text mb-1">Janv. - Févr. 2025</div>
+                                    <div class="font-bold text-white text-lg">Nestlé Nespresso SA</div>
+                                    <div class="text-sm text-brand-text mt-1">Vendeur (spécialiste café)</div>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div class="w-full lg:w-2/3">
+                            <div id="exp-mairie" class="exp-panel hidden minimal-card p-10 animate-fade-in">
+                                <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-white mb-1">Mairie de Cannes</h3>
+                                        <p class="text-brand-title font-medium">Adjoint territorial</p>
+                                    </div>
+                                    <div class="flex gap-3 text-sm text-brand-text">
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Sept. 2026 - Aujourd'hui</span>
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Cannes</span>
+                                    </div>
+                                </div>
+                                <p class="text-brand-text text-lg leading-relaxed">Au sein des établissements culturels de la Ville de Cannes, j'assure différentes missions liées à l'accueil du public et au bon fonctionnement des espaces :</p>
+                                <ul class="space-y-3 mt-6 mb-6 text-sm text-white">
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Accueil, information et orientation des visiteurs.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Gestion de la caisse : ouverture, encaissement et clôture.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Vente de produits en boutique et conseil aux visiteurs.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Surveillance et gardiennage des espaces d'exposition.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Veille au respect des consignes et à la bonne expérience des visiteurs.</li>
+                                </ul>
+                                <p class="text-brand-text text-lg leading-relaxed mb-8">Cette fonction polyvalente me permet de développer mes compétences en relation client, organisation, rigueur et gestion des responsabilités.</p>
+                                <div class="flex flex-wrap gap-2 mt-4 border-t border-brand-border/50 pt-6">
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Sens de l'organisation</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Satisfaction client</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Relation client</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Rigueur</span>
+                                </div>
+                            </div>
+
+                            <div id="exp-metro" class="exp-panel hidden minimal-card p-10 animate-fade-in">
+                                <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-white mb-1">METRO France</h3>
+                                        <p class="text-brand-title font-medium">Préparateur de commandes</p>
+                                    </div>
+                                    <div class="flex gap-3 text-sm text-brand-text">
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Août 2026</span>
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Fréjus</span>
+                                    </div>
+                                </div>
+                                <p class="text-brand-text text-lg leading-relaxed">Au sein des Halles METRO de Fréjus, j'ai occupé le poste de préparateur de commandes pendant un mois, avec pour principales missions :</p>
+                                <ul class="space-y-3 mt-6 mb-6 text-sm text-white">
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Préparation et rassemblement des commandes clients dans le respect des références et des quantités demandées.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Contrôle de la conformité des produits avant leur mise à disposition.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Organisation des préparations afin de respecter les deadlines.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Application des procédures internes et des règles de sécurité.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Travail en équipe pour assurer la fluidité des opérations et la satisfaction client.</li>
+                                </ul>
+                                <p class="text-brand-text text-lg leading-relaxed mb-8">Cette expérience m'a permis de renforcer mon sens de l'organisation, ma rigueur, ma réactivité et ma capacité à travailler efficacement dans un environnement dynamique.</p>
+                                <div class="flex flex-wrap gap-2 mt-4 border-t border-brand-border/50 pt-6">
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Réactivité</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Sens de l'organisation</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Travail en équipe</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Rigueur</span>
+                                </div>
+                            </div>
+                            
+                            <div id="exp-opale" class="exp-panel block minimal-card p-10 animate-fade-in">
+                                <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-white mb-1">Opale Marine</h3>
+                                        <p class="text-brand-title font-medium">Stagiaire marketing</p>
+                                    </div>
+                                    <div class="flex gap-3 text-sm text-brand-text">
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Avr. - Mai 2026</span>
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Golfe-Juan</span>
+                                    </div>
+                                </div>
+                                <p class="text-brand-text text-lg leading-relaxed">Dans le cadre de mon stage au sein d'Opale Marine, entreprise spécialisée dans la commercialisation de bateaux, j'ai participé au développement de sa communication et de sa présence digitale. Mes principales missions :</p>
+                                <ul class="space-y-3 mt-6 mb-6 text-sm text-white">
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Création et développement de la présence de l'entreprise sur les réseaux sociaux (Instagram, Facebook et LinkedIn).</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Création de contenus digitaux : publications, Reels et Stories.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Conception et mise à jour de supports de communication : brochure commerciale et cartes de visite.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Participation à la stratégie de communication autour des modèles de bateaux, notamment en partenariat avec Kumbra Yachts.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Réflexion sur l'optimisation de la visibilité en ligne, le référencement naturel (SEO) et les campagnes emailing.</li>
+                                </ul>
+                                <p class="text-brand-text text-lg leading-relaxed mb-8">Cette expérience m'a permis de développer mes compétences en marketing digital, création de contenu, communication commerciale et gestion de projets.</p>
+                                <div class="flex flex-wrap gap-2 mt-4 border-t border-brand-border/50 pt-6">
+                                    <span class="px-3 py-1 bg-brand-blue/10 border border-brand-blue/30 rounded-full text-xs text-brand-blue font-medium">Stratégie de communication</span>
+                                    <span class="px-3 py-1 bg-brand-blue/10 border border-brand-blue/30 rounded-full text-xs text-brand-blue font-medium">Marketing digital</span>
+                                    <span class="px-3 py-1 bg-brand-blue/10 border border-brand-blue/30 rounded-full text-xs text-brand-blue font-medium">Création de contenu</span>
+                                    <span class="px-3 py-1 bg-brand-blue/10 border border-brand-blue/30 rounded-full text-xs text-brand-blue font-medium">Gestion de projets</span>
+                                </div>
+                            </div>
+
+                            <div id="exp-dgfip" class="exp-panel hidden minimal-card p-10 animate-fade-in">
+                                <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-white mb-1">DGFiP</h3>
+                                        <p class="text-brand-title font-medium">Comptable vacataire</p>
+                                    </div>
+                                    <div class="flex gap-3 text-sm text-brand-text">
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Juillet 2025</span>
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Draguignan</span>
+                                    </div>
+                                </div>
+                                <ul class="space-y-3 mt-6 mb-8 text-sm text-white">
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Responsabilité de la comptabilité du service.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Gestion de tout le courrier.</li>
+                                    <li class="flex items-start gap-3"><span class="text-brand-text mt-0.5">→</span> Accueil et prise de rendez-vous au guichet.</li>
+                                </ul>
+                                <div class="flex flex-wrap gap-2 mt-4 border-t border-brand-border/50 pt-6">
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Microsoft Excel</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Comptabilité</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Rigueur</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Gestion administrative</span>
+                                </div>
+                            </div>
+
+                            <div id="exp-nespresso" class="exp-panel hidden minimal-card p-10 animate-fade-in">
+                                <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-white mb-1">Nestlé Nespresso SA</h3>
+                                        <p class="text-brand-title font-medium">Vendeur (spécialiste café)</p>
+                                    </div>
+                                    <div class="flex gap-3 text-sm text-brand-text">
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Janv. - Févr. 2025</span>
+                                        <span class="px-3 py-1 bg-[#09090b] rounded-full border border-brand-border">Cannes</span>
+                                    </div>
+                                </div>
+                                <p class="text-brand-text text-lg leading-relaxed mb-4">Le premier poste que j'ai occupé est celui de l'accueil. Étant le premier contact avec les clients, j'ai appris à être le plus avenant et accueillant.</p>
+                                <p class="text-brand-text text-lg leading-relaxed mb-4">Les managers m'ont fait confiance très rapidement et m'ont formé pour devenir expert café.</p>
+                                <p class="text-brand-text text-lg leading-relaxed mb-8">En plus des techniques de vente, ce stage m'a aidé à développer mes capacités relationnelles telles que l'écoute active, le travail en équipe et la gestion du stress.</p>
+                                <div class="flex flex-wrap gap-2 mt-4 border-t border-brand-border/50 pt-6">
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Vente & Accueil</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Écoute active</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Gestion du stress</span>
+                                    <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Travail en équipe</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- Fin du conteneur flex timeline/panneaux -->
+
+                    <!-- Section Compétences déplacée en dessous -->
+                    <div class="mt-24 pt-12 border-t border-brand-border/20">
+                        <span class="section-tag mb-4">Expertises</span>
+                        <h2 class="text-3xl font-bold text-white mb-8">Compétences clés</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="minimal-card p-8">
+                                <h3 class="text-sm font-semibold text-brand-text uppercase tracking-wider mb-6">Business & Stratégie</h3>
+                                <div class="space-y-5">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Compréhension des besoins</span> <span class="text-brand-text">Avancé</span></div>
+                                        <div class="h-1.5 w-full bg-[#09090b] rounded-full overflow-hidden"><div class="h-full bg-white w-[90%] rounded-full"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Recommandations stratégiques</span> <span class="text-brand-text">Intermédiaire</span></div>
+                                        <div class="h-1.5 w-full bg-[#09090b] rounded-full overflow-hidden"><div class="h-full bg-white/70 w-[60%] rounded-full"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="minimal-card p-8">
+                                <h3 class="text-sm font-semibold text-brand-text uppercase tracking-wider mb-6">Marketing Digital</h3>
+                                <div class="space-y-5">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">SEO & Visibilité web</span> <span class="text-brand-text">Intermédiaire</span></div>
+                                        <div class="h-1.5 w-full bg-[#09090b] rounded-full overflow-hidden"><div class="h-full bg-white/70 w-[70%] rounded-full"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Email Marketing (Campagnes)</span> <span class="text-brand-text">Intermédiaire</span></div>
+                                        <div class="h-1.5 w-full bg-[#09090b] rounded-full overflow-hidden"><div class="h-full bg-white/70 w-[65%] rounded-full"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Analyse de conversion</span> <span class="text-brand-text">Intermédiaire</span></div>
+                                        <div class="h-1.5 w-full bg-[#09090b] rounded-full overflow-hidden"><div class="h-full bg-white/70 w-[60%] rounded-full"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section id="hobbies" class="py-24 border-t border-brand-border/30">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="mb-12">
+                        <span class="section-tag mb-4">Centres d'intérêts</span>
+                        <h2 class="text-3xl font-bold text-white">Explorations et passions</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="space-y-4">
+                            <div class="p-5 bg-white/5 border border-white/5 rounded-2xl">
+                                <h3 class="text-white font-bold mb-1">Voyages</h3>
+                                <p class="text-brand-text text-sm">Découvrir d'autres marchés, d'autres habitudes de consommation.</p>
+                            </div>
+                            <div class="p-5 bg-white/5 border border-white/5 rounded-2xl">
+                                <h3 class="text-white font-bold mb-1">Business</h3>
+                                <p class="text-brand-text text-sm">Analyser comment les entreprises défendent leur position.</p>
+                            </div>
+                            <div class="p-5 bg-white/5 border border-white/5 rounded-2xl">
+                                <h3 class="text-white font-bold mb-1">Automobile / F1</h3>
+                                <p class="text-brand-text text-sm">Un sport où la performance se mesure au millième.</p>
+                            </div>
+                            <div class="p-5 bg-white/5 border border-white/5 rounded-2xl">
+                                <h3 class="text-white font-bold mb-1">Piano</h3>
+                                <p class="text-brand-text text-sm">Rigueur, répétition et sens du rythme.</p>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 minimal-card p-8 flex flex-col justify-between">
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-sm font-semibold text-brand-text uppercase tracking-wider">Pays visités</h3>
+                                <div class="text-3xl font-bold text-brand-blue">15</div>
+                            </div>
+                            <div id="d3-map-wrapper" class="relative w-full aspect-[16/9] max-h-[350px] my-4 rounded-xl bg-[#09090b] border border-brand-border flex items-center justify-center overflow-hidden">
+                                <div class="text-brand-text text-sm">Chargement de la carte...</div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                <span class="px-3 py-1 bg-[#09090b] border border-brand-border rounded-full text-xs text-brand-text">France</span>
+                                <span class="px-3 py-1 bg-[#09090b] border border-brand-border rounded-full text-xs text-brand-text">Espagne</span>
+                                <span class="px-3 py-1 bg-[#09090b] border border-brand-border rounded-full text-xs text-brand-text">Italie</span>
+                                <span class="px-3 py-1 bg-[#09090b] border border-brand-border rounded-full text-xs text-brand-text">Suisse</span>
+                                <span class="px-3 py-1 bg-[#09090b] border border-brand-border rounded-full text-xs text-brand-text">Allemagne</span>
+                                <span class="px-3 py-1 bg-[#09090b] border border-brand-border rounded-full text-xs text-brand-text">Maroc</span>
+                                <span class="px-3 py-1 bg-[#09090b] border border-brand-border rounded-full text-xs text-brand-text">Suède</span>
+                                <span class="px-3 py-1 text-xs text-brand-text self-center">+ 8 autres</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact" class="py-32 border-t border-brand-border/30 bg-[#09090b] relative overflow-hidden">
+                <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+                    <h2 class="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">Let's talk.</h2>
+                    <p class="text-xl text-brand-text mb-12 max-w-2xl mx-auto">
+                        Vous recherchez un profil analytique pour un stage ? Échangeons sur vos besoins.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+                        <!-- Lien Base64 pour que le bouton télécharge un PDF en cliquant -->
+                        <a href="data:application/pdf;base64,JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURlY29kZT4+CnN0cmVhbQp4nDPQM1Qo5ypUMFAwALJMLU31jBQsTAz1DMyBQs5KyvkK5QqWZqYK5hDK0MhUz9TUREE/N7O4RKE0OSMxLz01ryS1uEQhPzMvOVXB3Bwop2BuYKigl5lXklmcnIqspCg1sSi/JDUvF2ZVYm6qgqOzgqOfo4Kro4Kbh6OCl5ujo4K3F5C0AIqWpCbnxXJ5QcMA1gEi1QplbmRzdHJlYW0KZW5kb2JqCgozIDAgb2JqCjExNgplbmRvYmoKCjQgMCBvYmoKPDwvVHlwZS9QYWdlL01lZGlhQm94IFswIDAgNTk1LjI4IDg0MS44OV0vUmVzb3VyY2VzPDwvRm9udDw8L0YxIDEgMCBSPj4+Pi9Db250ZW50cyAyIDAgUi9QYXJlbnQgNSAwIFI+PgplbmRvYmoKCjEgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCgo1IDAgb2JqCjw8L1R5cGUvUGFnZXMvQ291bnQgMS9LaWRzWzQgMCBSXT4+CmVuZG9iagoKNiAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgNSAwIFI+PgplbmRvYmoKCjcgMCBvYmoKPDwvUHJvZHVjZXIoZ2F2ZS5xdWVzdGlvbnMpL0NyZWF0aW9uRGF0ZShEOjIwMjQxMDIyMTIwMDAwWik+PgplbmRvYmoKeHJlZgowIDgKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMjM0IDAwMDAwIG4gCjAwMDAwMDAwMTkgMDAwMDAgbiAKMDAwMDAwMDE4NSAwMDAwMCBuIAowMDAwMDAwMjAzIDAwMDAwIG4gCjAwMDAwMDAzMjIgMDAwMDAgbiAKMDAwMDAwMDM3OSAwMDAwMCBuIAowMDAwMDAwNDI4IDAwMDAwIG4gCnRyYWlsZXIKPDwvU2l6ZSA4L1Jvb3QgNiAwIFIvSW5mbyA3IDAgUj4+CnN0YXJ0eHJlZgo1MTkKJSVFT0YK" download="CV_Flavio_RUDI.pdf" class="btn-primary px-8 py-4 text-lg flex items-center justify-center gap-3" data-tooltip="Télécharger le PDF">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Télécharger mon CV
+                        </a>
+                        <!-- Email Link with target="_blank" -->
+                        <a href="mailto:flaviorudi07@gmail.com" target="_blank" rel="noopener noreferrer" class="btn-outline px-8 py-4 text-lg flex items-center justify-center gap-3" data-tooltip="Ouvrir la messagerie">
+                            M'envoyer un mail
+                        </a>
+                    </div>
+
+                    <div class="flex justify-center gap-8 text-brand-text">
+                        <a href="https://linkedin.com/in/flavio-rudi-8b18192b9" target="_blank" class="hover:text-white transition-colors flex items-center gap-2" data-tooltip="Voir mon profil LinkedIn">
+                            LinkedIn <span class="text-sm">↗</span>
+                        </a>
+                        <a href="tel:+33670403883" class="hover:text-white transition-colors flex items-center gap-2" data-tooltip="M'appeler">
+                            +33 6 70 40 38 83
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="py-8 border-t border-brand-border bg-[#09090b] text-center text-sm text-brand-text">
+                <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+                    <div>&copy; 2026 • Flavio RUDI</div>
+                    <div class="mt-2 md:mt-0 font-medium">Design Minimal & Motion</div>
+                </div>
+            </footer>
+        </div>
+
+        <div id="view-about" class="spa-view hidden bg-[#09090b] min-h-screen text-brand-text">
+            <nav class="fixed w-full top-0 z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-brand-border/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-20 items-center">
+                    <a href="#" onclick="navigateTo('view-home'); return false;" class="text-white font-bold flex items-center gap-2 hover:opacity-80 transition-opacity" data-tooltip="Retourner à l'accueil">
+                        <span class="bg-white text-black px-2 py-1 rounded-md text-xl tracking-tight">FR.</span>
+                    </a>
+                    <a href="#" onclick="navigateTo('view-home'); return false;" class="text-sm font-medium hover:text-white transition-colors" data-tooltip="Retourner à l'accueil">&larr; Retour à l'accueil</a>
+                </div>
+            </nav>
+            <div class="pt-32 pb-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="animate-on-show">
+                    <span class="section-tag mb-4">À propos</span>
+                    <h1 class="text-4xl md:text-6xl font-bold text-white mb-12 tracking-tight">Qui suis-je ?</h1>
+                </div>
+
+                <!-- Moodboard Collage -->
+                <div class="mb-16 grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[160px] animate-on-show delay-100">
+                    <div class="col-span-1 row-span-2 rounded-2xl overflow-hidden border border-brand-border group bg-[#18181b]">
+                        <img src="https://placehold.co/600x800/18181b/ffffff?text=[+Image+1+]" alt="Moodboard 1" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div class="col-span-1 row-span-1 rounded-2xl overflow-hidden border border-brand-border group bg-[#18181b]">
+                        <img src="https://placehold.co/600x400/18181b/ffffff?text=[+Image+2+]" alt="Moodboard 2" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div class="col-span-2 md:col-span-1 row-span-2 rounded-2xl overflow-hidden border border-brand-border group bg-[#18181b]">
+                        <img src="https://placehold.co/600x800/18181b/ffffff?text=[+Image+3+]" alt="Moodboard 3" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div class="col-span-1 row-span-1 rounded-2xl overflow-hidden border border-brand-border group bg-[#18181b] hidden md:block">
+                        <img src="https://placehold.co/600x400/18181b/ffffff?text=[+Image+4+]" alt="Moodboard 4" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                </div>
+
+                <!-- Texte de présentation -->
+                <div class="prose prose-invert prose-lg max-w-none text-brand-text space-y-6">
+                    <p class="text-xl text-white font-medium leading-relaxed text-reveal delay-200">
+                        Étudiant en troisième année du BUT Techniques de Commercialisation, je m'intéresse à la manière dont les entreprises comprennent leurs clients, développent leurs activités et prennent leurs décisions.
+                    </p>
+                    <p class="text-reveal delay-300">
+                        Au fil de mes expériences, j'ai pu explorer différents univers, de la relation client à la gestion, en passant par la communication et le marketing digital. Ces expériences m'ont permis de développer mon adaptabilité, mon autonomie et ma capacité à aborder les problématiques sous différents angles.
+                    </p>
+                    <p class="text-reveal delay-400">
+                        Curieux et attiré par les environnements en constante évolution, je souhaite aujourd'hui approfondir mes compétences en analyse de données et en stratégie business, afin de transformer les informations en idées concrètes et en leviers de performance.
+                    </p>
+                    <p class="text-reveal delay-500">
+                        J'aime apprendre, comprendre et donner du sens aux projets auxquels je participe.
+                    </p>
+                </div>
+
+                <!-- Mots-clés interactifs -->
+                <div class="flex flex-wrap gap-4 mt-12 animate-on-show delay-600">
+                    <span class="px-5 py-2.5 bg-[#18181b] border border-brand-border rounded-xl text-sm font-medium text-brand-text hover:text-white hover:border-white transition-all duration-300 cursor-pointer" data-tooltip="Curiosité">Curiosité</span>
+                    <span class="px-5 py-2.5 bg-[#18181b] border border-brand-border rounded-xl text-sm font-medium text-brand-text hover:text-brand-blue hover:border-brand-blue transition-all duration-300 cursor-pointer" data-tooltip="Adaptabilité">Adaptabilité</span>
+                    <span class="px-5 py-2.5 bg-[#18181b] border border-brand-border rounded-xl text-sm font-medium text-brand-text hover:text-white hover:border-white transition-all duration-300 cursor-pointer" data-tooltip="Analyse">Analyse</span>
+                    <span class="px-5 py-2.5 bg-[#18181b] border border-brand-border rounded-xl text-sm font-medium text-brand-text hover:text-brand-blue hover:border-brand-blue transition-all duration-300 cursor-pointer" data-tooltip="Stratégie">Stratégie</span>
+                </div>
+
+                <!-- Section Sports et Centres d'intérêt (Graphiques) -->
+                <div class="mt-24 pt-16 border-t border-brand-border/30 text-reveal delay-600">
+                    <span class="section-tag mb-8">Sports & Passions</span>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-4">
+                        <!-- Graphique : Sports -->
+                        <div class="minimal-card p-8 cursor-pointer" data-tooltip="Explorer mes sports">
+                            <div class="flex items-center gap-3 mb-8">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <h3 class="text-2xl font-bold text-white tracking-tight">Sports</h3>
+                            </div>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Judo</span> <span class="text-brand-text">9 ans</span></div>
+                                    <div class="h-2 w-full bg-[#09090b] rounded-full overflow-hidden border border-brand-border">
+                                        <div class="h-full bg-white w-full rounded-full bar-grow" style="animation-delay: 0.8s;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Athlétisme</span> <span class="text-brand-text">2 ans</span></div>
+                                    <div class="h-2 w-full bg-[#09090b] rounded-full overflow-hidden border border-brand-border">
+                                        <div class="h-full bg-white/70 w-[22%] rounded-full bar-grow" style="animation-delay: 0.9s;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Salle de sport</span> <span class="text-brand-text">2 ans</span></div>
+                                    <div class="h-2 w-full bg-[#09090b] rounded-full overflow-hidden border border-brand-border">
+                                        <div class="h-full bg-white/50 w-[22%] rounded-full bar-grow" style="animation-delay: 1.0s;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Graphique : Musique (Restauration) -->
+                        <div class="minimal-card p-8 cursor-pointer" data-tooltip="Explorer ma musique">
+                            <div class="flex items-center gap-3 mb-8">
+                                <svg class="w-6 h-6 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                                <h3 class="text-2xl font-bold text-white tracking-tight">Musique</h3>
+                            </div>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Batterie</span> <span class="text-brand-text">9 ans</span></div>
+                                    <div class="h-2 w-full bg-[#09090b] rounded-full overflow-hidden border border-brand-border">
+                                        <div class="h-full bg-brand-blue w-full rounded-full bar-grow" style="animation-delay: 1.2s;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Piano</span> <span class="text-brand-text">6 ans</span></div>
+                                    <div class="h-2 w-full bg-[#09090b] rounded-full overflow-hidden border border-brand-border">
+                                        <div class="h-full bg-brand-blue/80 w-[66%] rounded-full bar-grow" style="animation-delay: 1.3s;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="text-white font-medium">Solfège</span> <span class="text-brand-text">4 ans</span></div>
+                                    <div class="h-2 w-full bg-[#09090b] rounded-full overflow-hidden border border-brand-border">
+                                        <div class="h-full bg-brand-blue/60 w-[44%] rounded-full bar-grow" style="animation-delay: 1.4s;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: PROJETS -->
+        <div id="view-projects" class="spa-view hidden bg-[#09090b] min-h-screen text-brand-text">
+            <nav class="fixed w-full top-0 z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-brand-border/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-20 items-center">
+                    <a href="#" onclick="navigateTo('view-home'); return false;" class="text-white font-bold flex items-center gap-2 hover:opacity-80 transition-opacity" data-tooltip="Retourner à l'accueil">
+                        <span class="bg-white text-black px-2 py-1 rounded-md text-xl tracking-tight">FR.</span>
+                    </a>
+                    <a href="#" onclick="navigateTo('view-home'); return false;" class="text-sm font-medium hover:text-white transition-colors" data-tooltip="Retourner à l'accueil">&larr; Retour à l'accueil</a>
+                </div>
+            </nav>
+            <div class="pt-32 pb-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="animate-on-show mb-16">
+                    <span class="section-tag mb-4">Portfolio</span>
+                    <h1 class="text-4xl md:text-6xl font-bold text-white tracking-tight">Mes Projets</h1>
+                </div>
+
+                <!-- Liste des projets en grille (Cartes cliquables) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Carte 1 : Zentorno -->
+                    <div class="minimal-card overflow-hidden group relative animate-on-show delay-200 flex flex-col cursor-pointer h-full" onclick="openProjectModal('zentorno')" data-tooltip="Ouvrir le projet">
+                        <!-- Badge Universitaire -->
+                        <div class="absolute top-4 left-4 z-20">
+                            <span class="px-3 py-1.5 bg-white text-black text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-black animate-pulse"></span>
+                                Universitaire
+                            </span>
+                        </div>
+                        
+                        <!-- Image Cover -->
+                        <div class="w-full h-56 relative overflow-hidden bg-[#121214] shrink-0">
+                            <img src="Capture d'écran 2026-10-20 090918.png" alt="Projet Zentorno" class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#18181b] via-transparent to-transparent"></div>
+                        </div>
+                        
+                        <!-- Contenu (Aperçu) -->
+                        <div class="p-6 md:p-8 relative z-10 bg-[#18181b] -mt-1 flex flex-col flex-1">
+                            <h3 class="text-xl font-bold text-white mb-2 line-clamp-2">SAE (Situation d'Apprentissage et d'Évaluation) Jeux de simulation d'entreprise</h3>
+                            <p class="text-brand-title font-medium text-sm mb-4">Zentorno</p>
+                            
+                            <div class="mt-auto pt-6 border-t border-brand-border/50 flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-[10px] text-brand-title">Marketing</span>
+                                <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-[10px] text-brand-title">Stratégie</span>
+                                <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-[10px] text-brand-text">+2</span>
+                            </div>
+                        </div>
+
+                        <!-- Données cachées pour la modale -->
+                        <div id="content-zentorno" class="hidden">
+                            <p class="text-brand-text mb-4 leading-relaxed text-lg">Dans le cadre de notre SAÉ (Situation d'Apprentissage et d'Évaluation) marketing, nous avons imaginé et développé Zentorno, une start-up innovante dans la mobilité... et nous avons remporté le jeu d'entreprise ! 🏆</p>
+                            <p class="text-brand-text mb-4 font-medium">Notre équipe a su :</p>
+                            
+                            <ul class="space-y-3 mb-8 text-brand-text">
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Définir une stratégie de marché audacieuse, avec trois produits phares (Scooter A, B et C).</li>
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Mettre en avant nos avantages concurrentiels et notre capacité à créer de nouveaux marchés.</li>
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Valoriser une équipe solide et complémentaire, moteur de notre succès.</li>
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Produire une vidéo stratégique de 5 minutes synthétisant vision, résultats et ambition.</li>
+                            </ul>
+                            
+                            <p class="text-brand-text mb-10 leading-relaxed">Cette victoire démontre notre capacité à innover, convaincre et exécuter avec excellence. Zentorno n'était pas seulement un projet... c'était le projet gagnant.</p>
+                            
+                            <div class="flex flex-wrap gap-2 pt-8 border-t border-brand-border/50">
+                                <span class="px-4 py-1.5 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Marketing</span>
+                                <span class="px-4 py-1.5 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Communication</span>
+                                <span class="px-4 py-1.5 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Stratégie Business</span>
+                                <span class="px-4 py-1.5 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Gestion de projet</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carte 2 : PinTheLocation -->
+                    <div class="minimal-card overflow-hidden group relative animate-on-show delay-400 flex flex-col cursor-pointer h-full" onclick="openProjectModal('pinthelocation')" data-tooltip="Ouvrir le projet">
+                        <!-- Badge Personnel -->
+                        <div class="absolute top-4 left-4 z-20">
+                            <span class="px-3 py-1.5 bg-brand-blue text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                                Personnel
+                            </span>
+                        </div>
+                        
+                        <!-- Image Cover -->
+                        <div class="w-full h-56 relative overflow-hidden bg-[#0d0d0f] shrink-0">
+                            <img src="Capture 1.PNG" alt="PinTheLocation" class="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 z-10" onerror="this.style.display='none'">
+                            <!-- Fallback visuel -->
+                            <div class="absolute inset-0 flex flex-col items-center justify-center z-0 bg-[#0d0d0f]">
+                                <div class="text-3xl font-bold text-brand-blue mb-1 tracking-tighter">PIN THE LOCATION.</div>
+                                <div class="text-[10px] text-brand-text font-medium uppercase tracking-widest">Guess the Location</div>
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#18181b] via-transparent to-transparent z-20"></div>
+                        </div>
+                        
+                        <!-- Contenu (Aperçu) -->
+                        <div class="p-6 md:p-8 relative z-30 bg-[#18181b] -mt-1 flex flex-col flex-1">
+                            <h3 class="text-xl font-bold text-white mb-2 line-clamp-2">PinTheLocation</h3>
+                            <p class="text-brand-title font-medium text-sm mb-4">Jeu de géographie</p>
+                            
+                            <div class="mt-auto pt-6 border-t border-brand-border/50 flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-[10px] text-brand-title">Web</span>
+                                <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-[10px] text-brand-title">SEO</span>
+                                <span class="px-3 py-1 bg-white/5 border border-brand-border rounded-full text-[10px] text-brand-text">+2</span>
+                            </div>
+                        </div>
+
+                        <!-- Données cachées pour la modale -->
+                        <div id="content-pinthelocation" class="hidden">
+                            <p class="text-brand-text mb-6 leading-relaxed text-lg">Conception et développement de PinTheLocation, un jeu géographique en ligne dont le concept repose sur la découverte et l'identification de lieux à partir d'indices.</p>
+                            <p class="text-brand-text mb-4 font-medium">Principales réalisations :</p>
+                            
+                            <ul class="space-y-3 mb-8 text-brand-text">
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Conception du concept et définition de l'expérience utilisateur.</li>
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Création d'un jeu interactif autour de la géographie et de la découverte du monde.</li>
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Développement d'une interface avec globe terrestre interactif et système d'indices.</li>
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Réflexion sur les mécaniques de fidélisation et d'engagement des utilisateurs.</li>
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Mise en place d'une approche multilingue (français et anglais).</li>
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Travail sur le référencement naturel (SEO) et les stratégies d'acquisition de trafic.</li>
+                                <li class="flex items-start gap-3"><span class="text-white mt-1">→</span> Étude des possibilités de monétisation et de développement du projet.</li>
+                            </ul>
+                            
+                            <p class="text-brand-text mb-10 leading-relaxed">Ce projet me permet de développer mes compétences en entrepreneuriat digital, marketing stratégique, acquisition de trafic et gestion de produit numérique, tout en travaillant sur un projet de A à Z.</p>
+                            
+                            <div class="flex flex-wrap gap-2 pt-8 border-t border-brand-border/50">
+                                <span class="px-4 py-1.5 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Création de sites web</span>
+                                <span class="px-4 py-1.5 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">SEO (Optimisation moteurs)</span>
+                                <span class="px-4 py-1.5 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Entrepreneuriat digital</span>
+                                <span class="px-4 py-1.5 bg-white/5 border border-brand-border rounded-full text-xs text-brand-title">Acquisition de trafic</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <!-- Modale (Pop-up) des projets -->
+                <div id="project-modal" class="fixed inset-0 z-[200000] bg-[#09090b]/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeProjectModal()">
+                    <div class="bg-[#18181b] border border-brand-border rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative transform scale-95 transition-transform duration-300 shadow-2xl flex flex-col" id="project-modal-box" onclick="event.stopPropagation()">
+                        <button onclick="closeProjectModal()" class="absolute top-4 right-4 w-10 h-10 bg-[#09090b]/80 backdrop-blur-sm border border-brand-border rounded-full flex items-center justify-center text-brand-text hover:text-white hover:border-white transition-colors z-50 cursor-pointer" data-tooltip="Fermer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                        
+                        <div id="project-modal-image" class="w-full h-64 md:h-80 relative overflow-hidden bg-[#121214] shrink-0">
+                            <!-- Image ajoutée en JS -->
+                        </div>
+                        
+                        <div class="p-8 md:p-12 relative z-10 bg-[#18181b] -mt-4 rounded-t-3xl border-t border-brand-border/30">
+                            <h3 id="project-modal-title" class="text-3xl md:text-4xl font-bold text-white mb-2"></h3>
+                            <p id="project-modal-subtitle" class="text-brand-blue font-medium text-lg mb-8"></p>
+                            
+                            <div id="project-modal-body">
+                                <!-- Contenu ajouté en JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="telemetry-sidebar" class="fixed top-0 right-0 h-full w-80 bg-[#121214]/95 backdrop-blur-2xl border-l border-brand-border z-[60] transform translate-x-full transition-transform duration-500 ease-motion shadow-2xl flex flex-col font-mono text-xs">
+        <div class="p-5 border-b border-brand-border flex justify-between items-center bg-[#09090b]">
+            <span class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-blue animate-pulse"></span>
+                Console Syst.
+            </span>
+            <button id="close-telemetry" class="text-brand-text hover:text-white transition-colors" data-tooltip="Fermer la télémétrie">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="p-5 flex-1 overflow-y-auto space-y-6">
+            
+            <!-- Global Status -->
+            <div class="grid grid-cols-2 gap-4 pb-4 border-b border-brand-border/50">
+                <div>
+                    <div class="text-brand-text mb-1 uppercase tracking-widest text-[10px]">Status</div>
+                    <div class="text-green-400 font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> ONLINE</div>
+                </div>
+                <div>
+                    <div class="text-brand-text mb-1 uppercase tracking-widest text-[10px]">Session</div>
+                    <div id="session-timer" class="text-white font-medium">00:00:00</div>
+                </div>
+            </div>
+
+            <!-- Scroll Depth -->
+            <div>
+                <div class="flex justify-between text-brand-text mb-2 uppercase tracking-widest text-[10px]">
+                    <span>Scroll Depth</span>
+                    <span id="scroll-depth-val" class="text-white">0 %</span>
+                </div>
+                <div class="w-full bg-[#09090b] rounded-full h-1.5 border border-brand-border">
+                    <div id="scroll-progress" class="bg-white h-1.5 rounded-full transition-all duration-100" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Navigation info -->
+            <div class="space-y-3 pb-4 border-b border-brand-border/50">
+                <div class="text-brand-text mb-2 uppercase tracking-widest text-[10px]">Environnement</div>
+                <div class="flex justify-between">
+                    <span class="text-brand-text">Navigateur</span>
+                    <span id="browser-info" class="text-white truncate max-w-[120px]">Detecting...</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-brand-text">Résolution</span>
+                    <span id="screen-res" class="text-white">1920x1080</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-brand-text">Localisation</span>
+                    <span class="text-white">FR (Client)</span>
+                </div>
+            </div>
+
+            <!-- Interaction Data -->
+            <div class="space-y-3 pb-4 border-b border-brand-border/50">
+                <div class="text-brand-text mb-2 uppercase tracking-widest text-[10px]">Interactions</div>
+                <div class="flex justify-between">
+                    <span class="text-brand-text">Souris (X, Y)</span>
+                    <span id="mouse-coords" class="text-brand-blue">0, 0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-brand-text">Dernier clic</span>
+                    <span id="last-click-time" class="text-white">Aucun</span>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="space-y-3">
+                <div class="text-brand-text mb-2 uppercase tracking-widest text-[10px]">Performances</div>
+                <div class="flex justify-between items-center">
+                    <span class="text-brand-text">Render FPS</span>
+                    <span id="fps-counter" class="text-green-400">60</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-brand-text">DOM Nodes</span>
+                    <span id="dom-nodes" class="text-white">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-brand-text">Mémoire</span>
+                    <span id="memory-usage" class="text-white">N/A</span>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // SPA Routing
+        function navigateTo(viewId) {
+            const targetView = document.getElementById(viewId);
+            if (!targetView) {
+                console.warn("View not found: " + viewId);
+                return;
+            }
+            
+            document.querySelectorAll('.spa-view').forEach(view => {
+                view.classList.remove('block');
+                view.classList.add('hidden');
+            });
+            targetView.classList.remove('hidden');
+            targetView.classList.add('block');
+            window.scrollTo(0, 0);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Intro Animation (motion design) ---
+            (function runIntro() {
+                const loader  = document.getElementById('intro-loader');
+                const curtain = document.getElementById('intro-curtain');
+                const dot     = document.getElementById('bouncing-dot');
+                const heroDot = document.getElementById('hero-dot');
+                const text    = document.querySelector('.intro-text');
+                const i1 = document.getElementById('intro-i1');
+                const i2 = document.getElementById('intro-i2');
+                if (!loader || !curtain || !dot || !heroDot || !text || !i1 || !i2) return;
+
+                const letters = [...document.querySelectorAll('.intro-letter > span')];
+                const wait = ms => new Promise(r => setTimeout(r, ms));
+                const ease = { out: 'cubic-bezier(.16,1,.3,1)', inOut: 'cubic-bezier(.76,0,.24,1)' };
+                const A = (el, frames, o) => el.animate(frames, { fill: 'forwards', ...o });
+                const withEase = (frames, e) => frames.map(f => ({ easing: e, ...f }));
+
+                let finished = false;
+                const cleanup = () => {
+                    if (finished) return;
+                    finished = true;
+                    heroDot.style.opacity = '1';
+                    document.body.style.overflow = '';
+                    loader.remove(); curtain.remove(); dot.remove();
+                };
+
+                document.body.style.overflow = 'hidden';
+                window.scrollTo(0, 0);
+
+                // Accessibilité : pas de mouvement → simple fondu
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    loader.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }).finished.then(cleanup);
+                    return;
+                }
+
+                // Filet de sécurité : l'intro ne peut jamais bloquer le site
+                setTimeout(cleanup, 9000);
+
+                // Révèle un élément du hero (fondu + montée + défocus)
+                const reveal = (el, delay, y = 28, d = 1000) => {
+                    const an = el.animate(
+                        [{ opacity: 0, translate: `0 ${y}px`, filter: 'blur(8px)' }, { opacity: 1, translate: '0 0', filter: 'blur(0px)' }],
+                        { duration: d, delay, easing: ease.out, fill: 'both' });
+                    an.finished.then(() => an.cancel()).catch(() => {});
+                };
+
+                async function play() {
+                    await Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), wait(1500)]);
+                    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+                    const body = dot.querySelector('.dot-body');
+                    const dotY = dot.querySelector('.dot-y');
+                    const fs = parseFloat(getComputedStyle(text).fontSize);
+                    const D = Math.round(Math.max(9, fs * 0.2));          // diamètre du point
+                    dot.style.width = dot.style.height = D + 'px';
+
+                    // --- Mesures (lettres à leur position finale) ---
+                    const marker = () => { const m = document.createElement('i'); m.style.cssText = 'display:inline-block;width:0;height:0'; return m; };
+                    const m1 = marker(), m2 = marker();
+                    i1.firstElementChild.appendChild(m1);
+                    i2.firstElementChild.appendChild(m2);
+                    letters.forEach(l => l.style.transform = 'none');
+                    const r1 = i1.getBoundingClientRect(), r2 = i2.getBoundingClientRect();
+                    const base1 = m1.getBoundingClientRect().bottom, base2 = m2.getBoundingClientRect().bottom;
+                    letters.forEach(l => l.style.transform = '');
+                    m1.remove(); m2.remove();
+
+                    const lift = fs * 0.546 + fs * 0.07 + D;               // x-height + espace + point
+                    const top1 = base1 - lift, top2 = base2 - lift;
+                    const x1 = r1.left + r1.width / 2 - D / 2;
+                    const x2 = r2.left + r2.width / 2 - D / 2;
+
+                    // --- 1. Les lettres montent une à une (masque + défocus) ---
+                    letters.forEach((l, i) => A(l,
+                        [{ transform: 'translateY(105%)', opacity: 0, filter: 'blur(6px)' }, { transform: 'translateY(0)', opacity: 1, filter: 'blur(0px)' }],
+                        { duration: 850, delay: i * 55, easing: ease.out }));
+
+                    await wait(500);
+
+                    // --- 2. Chute du point sur le 1er ı (étirement puis écrasement) ---
+                    dot.style.transform = `translateX(${x1}px)`;
+                    const fallMs = 480;
+                    A(dotY, [{ transform: `translateY(${top1 - Math.max(260, innerHeight * 0.3)}px)` }, { transform: `translateY(${top1}px)` }],
+                        { duration: fallMs, easing: 'cubic-bezier(.55,.085,.68,.53)' });
+                    await A(body, [
+                        { opacity: 0, transform: 'scale(.4,.4)' },
+                        { opacity: 1, transform: 'scale(.85,1.3)', offset: .3 },
+                        { opacity: 1, transform: 'scale(.85,1.3)' }], { duration: fallMs }).finished;
+
+                    const bump = el => el.animate(
+                        [{ transform: 'translateY(0)' }, { transform: 'translateY(.07em)' }, { transform: 'translateY(0)' }],
+                        { duration: 420, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+                    await A(body, [{ transform: 'scale(.85,1.3)' }, { transform: 'scale(1.5,.55)' }],
+                        { duration: 110, easing: 'cubic-bezier(.2,.8,.3,1)' }).finished;
+                    bump(i1.firstElementChild);
+
+                    // Le point reste sur le 1er i : un point fixe se pose pendant que l'autre repart
+                    const stay = document.createElement('div');
+                    stay.style.cssText = `position:absolute;left:${x1}px;top:${top1}px;width:${D}px;height:${D}px;border-radius:50%;background:#3b82f6;box-shadow:0 0 24px rgba(59,130,246,.55);transform-origin:50% 100%;`;
+                    loader.appendChild(stay);
+                    A(stay, withEase([
+                        { transform: 'scale(1.5,.55)' }, { transform: 'scale(.9,1.12)', offset: .45 }, { transform: 'scale(1,1)' }],
+                        'cubic-bezier(.34,1.56,.64,1)'), { duration: 450 });
+
+                    // --- 3. Rebond du 1er ı vers le 2e ı ---
+                    const hopMs = 620, hopH = fs * 1.15;
+                    A(dot, [{ transform: `translateX(${x1}px)` }, { transform: `translateX(${x2}px)` }],
+                        { duration: hopMs, easing: 'cubic-bezier(.33,0,.67,1)' });
+                    A(dotY, [
+                        { transform: `translateY(${top1}px)`, easing: 'cubic-bezier(.25,.46,.45,.94)' },
+                        { transform: `translateY(${top1 - hopH}px)`, offset: .48, easing: 'cubic-bezier(.55,.085,.68,.53)' },
+                        { transform: `translateY(${top2}px)` }], { duration: hopMs });
+                    await A(body, [
+                        { transform: 'scale(1.5,.55)', easing: 'cubic-bezier(.2,.8,.3,1)' },
+                        { transform: 'scale(.78,1.38)', offset: .14, easing: 'ease-in-out' },
+                        { transform: 'scale(1,1)', offset: .5, easing: 'ease-in-out' },
+                        { transform: 'scale(.84,1.28)', offset: .88 },
+                        { transform: 'scale(.84,1.28)' }], { duration: hopMs }).finished;
+
+                    A(body, withEase([
+                        { transform: 'scale(.84,1.28)' }, { transform: 'scale(1.55,.5)', offset: .2 },
+                        { transform: 'scale(.9,1.12)', offset: .5 }, { transform: 'scale(1.04,.96)', offset: .78 },
+                        { transform: 'scale(1,1)' }], 'ease-out'), { duration: 380 });
+                    bump(i2.firstElementChild);
+                    await wait(420);
+
+                    // --- Mesures de la cible (point final du titre) ---
+                    const h1 = heroDot.closest('h1');
+                    const mH = marker(); h1.appendChild(mH);
+                    const hr = heroDot.getBoundingClientRect();
+                    const h1r = h1.getBoundingClientRect();
+                    const baseH = mH.getBoundingClientRect().bottom;
+                    mH.remove();
+                    if (!hr.width) { cleanup(); return; }
+                    const hfs = parseFloat(getComputedStyle(h1).fontSize);
+                    const Dh = hfs * 0.155, sc = Dh / D;
+                    const xf = hr.left + hr.width / 2 - D / 2;
+                    const tf = baseH - D;
+
+                    // --- 4. Envol vers le titre + double rideau + entrée du hero ---
+                    const F = 1000;                                          // durée du vol
+                    const apex = Math.max(16, Math.min(top2, tf) - Math.max(110, innerHeight * 0.16));
+
+                    await A(body, [{ transform: 'scale(1,1)' }, { transform: 'scale(1.4,.62)' }],
+                        { duration: 130, easing: 'cubic-bezier(.3,0,.4,1)' }).finished;
+
+                    // Le point reste aussi sur le 2e i pendant que l'autre s'envole
+                    const stay2 = document.createElement('div');
+                    stay2.style.cssText = `position:absolute;left:${x2}px;top:${top2}px;width:${D}px;height:${D}px;border-radius:50%;background:#3b82f6;box-shadow:0 0 24px rgba(59,130,246,.55);transform-origin:50% 100%;`;
+                    loader.appendChild(stay2);
+                    A(stay2, withEase([
+                        { transform: 'scale(1.4,.62)' }, { transform: 'scale(.9,1.12)', offset: .45 }, { transform: 'scale(1,1)' }],
+                        'cubic-bezier(.34,1.56,.64,1)'), { duration: 450 });
+
+                    A(dot, [{ transform: `translateX(${x2}px)` }, { transform: `translateX(${xf}px)` }],
+                        { duration: F, easing: 'cubic-bezier(.5,0,.2,1)' });
+                    A(dotY, [
+                        { transform: `translateY(${top2}px)`, easing: 'cubic-bezier(.2,.75,.35,1)' },
+                        { transform: `translateY(${apex}px)`, offset: .42, easing: 'cubic-bezier(.6,.05,.8,.4)' },
+                        { transform: `translateY(${tf}px)` }], { duration: F });
+                    const flight = A(body, [
+                        { transform: 'scale(1.4,.62)', easing: 'ease-out' },
+                        { transform: 'scale(.72,1.5)', offset: .1, easing: 'ease-in-out' },
+                        { transform: 'scale(.9,1.12)', offset: .42, easing: 'ease-in-out' },
+                        { transform: `scale(${sc * .8},${sc * 1.35})`, offset: .9 },
+                        { transform: `scale(${sc},${sc})` }], { duration: F });
+
+                    // Texte d'intro qui s'efface
+                    const textOut = [{ opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' }, { opacity: 0, transform: 'translateY(6vh)', filter: 'blur(8px)' }];
+                    A(text, textOut, { duration: 650, delay: 60, easing: ease.inOut });
+                    [stay, stay2].forEach(st => A(st, [{ opacity: 1, translate: '0 0', filter: 'blur(0px)' }, { opacity: 0, translate: '0 6vh', filter: 'blur(8px)' }],
+                        { duration: 650, delay: 60, easing: ease.inOut }));
+
+                    // Double rideau : bleu (marque) qui suit le rideau sombre
+                    const down = [{ transform: 'translateY(0)' }, { transform: 'translateY(calc(100% + 14vh))' }];
+                    const c1 = A(loader, down, { duration: 1050, delay: 150, easing: ease.inOut });
+                    const c2 = A(curtain, down, { duration: 1050, delay: 260, easing: ease.inOut });
+
+                    // Titre : balayage de gauche à droite, calé pour arriver au point en même temps que lui
+                    const f = Math.min(1, Math.max(.05, (hr.right - h1r.left) / h1r.width));
+                    const wipeD = 800, wipeAt = (100 * (1 - f) - 0.5).toFixed(2) + '%';
+                    const wipe = A(h1, [
+                        { clipPath: 'inset(-15% 100% -15% -2%)', easing: 'cubic-bezier(.65,0,.2,1)' },
+                        { clipPath: `inset(-15% ${wipeAt} -15% -2%)`, offset: .92 },
+                        { clipPath: 'inset(-15% -5% -15% -2%)' }], { duration: wipeD, delay: Math.max(0, F - wipeD * .92), fill: 'both' });
+                    wipe.finished.then(() => wipe.cancel()).catch(() => {});
+
+                    // Le reste du hero entre en cascade
+                    [...h1.parentElement.children].forEach((el, k) => { if (el !== h1) reveal(el, 450 + k * 70); });
+                    const label = document.querySelector('.hero-card-stage')?.previousElementSibling;
+                    if (label) reveal(label, 720, 16, 900);
+                    document.querySelectorAll('.hero-card').forEach((c, k) => {
+                        const an = c.animate(
+                            [{ opacity: 0, translate: '0 90px', rotate: (k % 2 ? 8 : -8) + 'deg', scale: '.85' },
+                             { opacity: 1, translate: '0 0', rotate: '0deg', scale: '1' }],
+                            { duration: 1200, delay: 760 + k * 100, easing: ease.out, fill: 'both' });
+                        an.finished.then(() => an.cancel()).catch(() => {});
+                    });
+                    const nav = document.querySelector('#view-home nav');
+                    if (nav) {
+                        const an = nav.animate([{ opacity: 0, translate: '0 -100%' }, { opacity: 1, translate: '0 0' }],
+                            { duration: 900, delay: 500, easing: ease.out, fill: 'both' });
+                        an.finished.then(() => an.cancel()).catch(() => {});
+                    }
+
+                    await flight.finished;
+
+                    // --- 5. Atterrissage : le point devient le point final du titre ---
+                    const cx = xf + D / 2, cy = baseH - Dh / 2;
+                    const hd = heroDot.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' });
+                    hd.finished.then(() => { heroDot.style.opacity = '1'; hd.cancel(); }).catch(() => {});
+                    A(body, withEase([
+                        { transform: `scale(${sc},${sc})` }, { transform: `scale(${sc * 1.5},${sc * .55})`, offset: .35 },
+                        { transform: `scale(${sc},${sc})` }], 'ease-out'), { duration: 260 });
+                    A(dot, [{ opacity: 1 }, { opacity: 0 }], { duration: 220, delay: 40 });
+
+                    const ring = document.createElement('div');
+                    const R = Dh * 3;
+                    ring.style.cssText = `position:fixed;left:${cx - R / 2}px;top:${cy - R / 2}px;width:${R}px;height:${R}px;border:1.5px solid rgba(59,130,246,.85);border-radius:50%;z-index:100001;pointer-events:none;`;
+                    document.body.appendChild(ring);
+                    ring.animate([{ transform: 'scale(.3)', opacity: .9 }, { transform: 'scale(2.8)', opacity: 0 }],
+                        { duration: 850, easing: 'cubic-bezier(.16,1,.3,1)' }).finished.then(() => ring.remove());
+
+                    await Promise.all([c1.finished, c2.finished]);
+                    cleanup();
+                }
+
+                play().catch(cleanup);
+            })();
+
+            // --- Experience Tabs Logic ---
+            const tabs = document.querySelectorAll('.exp-tab');
+            const panels = document.querySelectorAll('.exp-panel');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => {
+                        t.classList.remove('opacity-100');
+                        t.classList.add('opacity-60');
+                        t.querySelector('div:first-child').classList.replace('bg-brand-title', 'bg-brand-border');
+                    });
+                    tab.classList.remove('opacity-60');
+                    tab.classList.add('opacity-100');
+                    tab.querySelector('div:first-child').classList.replace('bg-brand-border', 'bg-brand-title');
+                    panels.forEach(p => p.classList.add('hidden'));
+                    document.getElementById(tab.getAttribute('data-target')).classList.remove('hidden');
+                });
+            });
+
+            // --- Telemetry Sidebar Logic ---
+            const toggleBtn = document.getElementById('data-mode-toggle');
+            const closeBtn = document.getElementById('close-telemetry');
+            const sidebar = document.getElementById('telemetry-sidebar');
+            
+            // --- Projet Modal Logic ---
+            window.openProjectModal = function(id) {
+                const card = document.querySelector(`[onclick="openProjectModal('${id}')"]`);
+                if(!card) return;
+                
+                const imageContainer = card.querySelector('.relative.overflow-hidden').innerHTML;
+                const title = card.querySelector('h3').innerText;
+                const subtitle = card.querySelector('p').innerText;
+                const content = document.getElementById(`content-${id}`).innerHTML;
+                
+                const modal = document.getElementById('project-modal');
+                const modalBox = document.getElementById('project-modal-box');
+                
+                // Nettoie l'image clonée pour la modale
+                let cleanImage = imageContainer.replace(/<div class="absolute inset-0 bg-gradient-to-t[^>]*><\/div>/g, '');
+                
+                document.getElementById('project-modal-image').innerHTML = cleanImage;
+                document.getElementById('project-modal-title').innerText = title;
+                document.getElementById('project-modal-subtitle').innerText = subtitle;
+                document.getElementById('project-modal-body').innerHTML = content;
+                
+                modal.classList.remove('pointer-events-none');
+                requestAnimationFrame(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.classList.add('opacity-100');
+                    modalBox.classList.remove('scale-95');
+                    modalBox.classList.add('scale-100');
+                });
+                document.body.style.overflow = 'hidden'; 
+                
+                // Réinitialise rapidement le curseur si besoin
+                setTimeout(() => {
+                    const magicCursor = document.getElementById('magic-cursor');
+                    const cursorTooltip = document.getElementById('cursor-tooltip');
+                    if(magicCursor && magicCursor.classList.contains('hovering')) {
+                        magicCursor.classList.remove('hovering');
+                        if (cursorTooltip) cursorTooltip.style.opacity = '0';
+                    }
+                }, 50);
+            };
+
+            window.closeProjectModal = function() {
+                const modal = document.getElementById('project-modal');
+                const modalBox = document.getElementById('project-modal-box');
+                
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0');
+                modalBox.classList.remove('scale-100');
+                modalBox.classList.add('scale-95');
+                
+                setTimeout(() => {
+                    modal.classList.add('pointer-events-none');
+                    document.body.style.overflow = '';
+                }, 300);
+            };
+            
+            // Éléments de la télémétrie avancée
+            const sessionTimerEl = document.getElementById('session-timer');
+            const browserInfoEl = document.getElementById('browser-info');
+            const screenResEl = document.getElementById('screen-res');
+            const mouseCoordsEl = document.getElementById('mouse-coords');
+            const lastClickEl = document.getElementById('last-click-time');
+            const fpsCounterEl = document.getElementById('fps-counter');
+            const domNodesEl = document.getElementById('dom-nodes');
+            const memoryUsageEl = document.getElementById('memory-usage');
+            
+            let telemetryActive = false;
+            let sessionStartTime = Date.now();
+            let frames = 0;
+            let prevTime = performance.now();
+            
+            // Init informations environnement
+            if(browserInfoEl) {
+                const ua = navigator.userAgent;
+                let browserName = "Inconnu";
+                if(ua.includes("Firefox")) browserName = "Firefox";
+                else if(ua.includes("Chrome")) browserName = "Chrome";
+                else if(ua.includes("Safari")) browserName = "Safari";
+                else if(ua.includes("Edge")) browserName = "Edge";
+                browserInfoEl.textContent = browserName;
+            }
+            if(screenResEl) screenResEl.textContent = `${window.innerWidth} x ${window.innerHeight}`;
+            window.addEventListener('resize', () => {
+                if(screenResEl) screenResEl.textContent = `${window.innerWidth} x ${window.innerHeight}`;
+            });
+            
+            // Tracking souris et clics
+            window.addEventListener('mousemove', (e) => {
+                if(telemetryActive && mouseCoordsEl) {
+                    mouseCoordsEl.textContent = `${e.clientX}, ${e.clientY}`;
+                }
+            });
+            window.addEventListener('click', () => {
+                if(lastClickEl) {
+                    const d = new Date();
+                    lastClickEl.textContent = `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+                }
+            });
+            
+            // Boucle de rendu pour FPS, Timer et RAM
+            function telemetryLoop() {
+                const time = performance.now();
+                frames++;
+                if (time >= prevTime + 1000) {
+                    if(fpsCounterEl) fpsCounterEl.textContent = Math.round((frames * 1000) / (time - prevTime));
+                    frames = 0;
+                    prevTime = time;
+                    
+                    // Session Timer
+                    const diff = Math.floor((Date.now() - sessionStartTime) / 1000);
+                    const h = Math.floor(diff / 3600).toString().padStart(2,'0');
+                    const m = Math.floor((diff % 3600) / 60).toString().padStart(2,'0');
+                    const s = (diff % 60).toString().padStart(2,'0');
+                    if(sessionTimerEl) sessionTimerEl.textContent = `${h}:${m}:${s}`;
+                    
+                    // Memory
+                    if(domNodesEl) domNodesEl.textContent = document.getElementsByTagName('*').length;
+                    if(memoryUsageEl) {
+                        if(performance && performance.memory) {
+                            memoryUsageEl.textContent = (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + ' MB';
+                        } else {
+                            memoryUsageEl.textContent = 'Non dispo.';
+                        }
+                    }
+                }
+                if(telemetryActive) requestAnimationFrame(telemetryLoop);
+            }
+
+            window.toggleTelemetry = function() {
+                telemetryActive = !telemetryActive;
+                if (telemetryActive) {
+                    sidebar.classList.remove('translate-x-full');
+                    toggleBtn.classList.add('text-white', 'bg-white/10');
+                    requestAnimationFrame(telemetryLoop);
+                } else {
+                    sidebar.classList.add('translate-x-full');
+                    toggleBtn.classList.remove('text-white', 'bg-white/10');
+                }
+            };
+            
+            if(toggleBtn) toggleBtn.addEventListener('click', window.toggleTelemetry);
+            if(closeBtn) closeBtn.addEventListener('click', window.toggleTelemetry);
+
+            window.addEventListener('scroll', () => {
+                if(telemetryActive) {
+                    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    const scrolled = Math.round((winScroll / height) * 100) || 0;
+                    document.getElementById('scroll-depth-val').textContent = `${scrolled} %`;
+                    document.getElementById('scroll-progress').style.width = `${scrolled}%`;
+                }
+            });
+
+            // --- Magic Cursor Logic ---
+            const magicCursor = document.getElementById('magic-cursor');
+            const cursorTooltip = document.getElementById('cursor-tooltip');
+            if (magicCursor && window.matchMedia("(pointer: fine)").matches) {
+                let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+                let cursorX = mouseX, cursorY = mouseY;
+                let hasMoved = false;
+
+                window.addEventListener('mousemove', (e) => {
+                    if (!hasMoved) { magicCursor.style.opacity = '1'; hasMoved = true; }
+                    mouseX = e.clientX; mouseY = e.clientY;
+                    
+                    // Positionnement de la bulle d'aide textuelle
+                    if (cursorTooltip) {
+                        cursorTooltip.style.left = mouseX + 'px';
+                        cursorTooltip.style.top = mouseY + 'px';
+                    }
+                });
+
+                const animateCursor = () => {
+                    cursorX += (mouseX - cursorX) * 0.2;
+                    cursorY += (mouseY - cursorY) * 0.2;
+                    magicCursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
+                    requestAnimationFrame(animateCursor);
+                };
+                animateCursor();
+
+                const setupHover = () => {
+                    document.querySelectorAll('a, button, .cursor-pointer, .hero-card, .exp-tab').forEach(el => {
+                        if(!el.dataset.cursorBound) {
+                            el.addEventListener('mouseenter', () => {
+                                magicCursor.classList.add('hovering');
+                                
+                                // Gestion dynamique du texte de l'infobulle
+                                let tooltipText = el.getAttribute('data-tooltip');
+                                if (!tooltipText) {
+                                    if (el.classList.contains('hero-card')) tooltipText = "Explorer le projet";
+                                    else if (el.classList.contains('exp-tab')) tooltipText = "Voir l'expérience";
+                                    else tooltipText = "";
+                                }
+                                
+                                if (cursorTooltip && tooltipText !== "") {
+                                    cursorTooltip.textContent = tooltipText;
+                                    cursorTooltip.style.opacity = '1';
+                                }
+                            });
+                            
+                            el.addEventListener('mouseleave', () => {
+                                magicCursor.classList.remove('hovering');
+                                if (cursorTooltip) {
+                                    cursorTooltip.style.opacity = '0';
+                                }
+                            });
+                            el.dataset.cursorBound = "true";
+                        }
+                    });
+                };
+                setupHover();
+                document.body.addEventListener('click', () => setTimeout(setupHover, 100));
+            }
+
+            // --- D3.js Map Logic ---
+            const initMap = async () => {
+                const width = 800, height = 500;
+                const container = d3.select("#d3-map-wrapper");
+                
+                // Modified scale from 600 down to 450 to zoom out properly
+                const projection = d3.geoMercator().center([10, 48]).scale(450).translate([width / 2, height / 2]);
+                const path = d3.geoPath().projection(projection);
+                
+                try {
+                    const world = await d3.json("https://unpkg.com/world-atlas@2.0.2/countries-110m.json");
+                    const countries = topojson.feature(world, world.objects.countries).features;
+                    
+                    container.html('');
+                    const svg = container.append("svg").attr("viewBox", `0 0 ${width} ${height}`).attr("class", "w-full h-full");
+                    
+                    const visited = ["France", "Spain", "Italy", "Switzerland", "Germany", "Morocco", "Sweden", "Poland", "Hungary", "Romania", "Bulgaria", "Albania", "Malta", "Denmark", "Netherlands"];
+                    
+                    svg.append("g").selectAll("path").data(countries).enter().append("path")
+                        .attr("d", path)
+                        .attr("fill", d => visited.includes(d.properties.name) ? "rgba(59, 130, 246, 0.4)" : "#09090b")
+                        .attr("stroke", d => visited.includes(d.properties.name) ? "#3b82f6" : "#27272a")
+                        .attr("stroke-width", d => visited.includes(d.properties.name) ? 1.5 : 1)
+                        .attr("class", "transition-all duration-500")
+                        .on("mouseover", function() { d3.select(this).attr("fill", "rgba(59, 130, 246, 0.6)"); })
+                        .on("mouseout", function(e, d) { d3.select(this).attr("fill", visited.includes(d.properties.name) ? "rgba(59, 130, 246, 0.4)" : "#09090b"); })
+                        .append("title").text(d => d.properties.name);
+                        
+                } catch (error) {
+                    console.error("Map error:", error);
+                    container.html('<div class="text-brand-text text-sm">Carte indisponible.</div>');
+                }
+            };
+            initMap();
+        });
+    </script>
+</body>
+</html>
