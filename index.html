@@ -30,6 +30,39 @@
     @media(min-width:900px){.cursor{display:block}a,button,.work-card{cursor:none}}
     @media(max-width:760px){.nav{padding:18px var(--gutter)}.nav-links{display:none;position:absolute;top:65px;left:var(--gutter);right:var(--gutter);background:#1b1c18;padding:25px;flex-direction:column;align-items:flex-start;border:1px solid var(--line)}.nav-links.open{display:flex}.nav-links a{font-size:13px}.nav-contact{display:none}.menu-toggle{display:block}.hero{padding-top:125px;min-height:90svh}.hero-main{grid-template-columns:1fr;margin:12vh 0 8vh}.hero h1{font-size:clamp(72px,17vw,130px)}.hero-aside{max-width:340px;padding:25px 0 0}.hero-topline,.hero-bottom{font-size:9px}.hero-bottom span:last-child{display:none}.section-head{margin-bottom:40px}.work-grid{grid-template-columns:1fr;gap:55px}.work-card:nth-child(2){margin-top:0}.work-card:nth-child(2) .work-image{aspect-ratio:1.2}.manifesto-copy{margin-top:40px}.manifesto-foot{align-items:start;gap:30px;flex-direction:column}.about-grid{grid-template-columns:1fr;gap:55px}.portrait-wrap{max-width:75%;margin:0 auto 0 0}.about-copy{font-size:22px}.timeline-item{grid-template-columns:1fr;gap:10px;padding:23px 0}.timeline-date{padding:0}.timeline-desc{max-width:100%}.skills{grid-template-columns:1fr;gap:45px}.contact-title{margin:65px 0 45px}.contact-bottom{align-items:flex-start;flex-direction:column}.contact-top{font-size:9px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}.loader{display:none}}
+  
+    .profile-page{display:none;position:fixed;inset:0;z-index:66;background:var(--bg);overflow:auto;padding:115px var(--gutter) 65px}
+    .profile-page.visible{display:block;animation:pageIn .65s var(--ease) both}
+    .profile-open main>section:not(#profile-page),.profile-open main>.hero,.profile-open main>.ticker,.profile-open main>.home-cards{visibility:hidden}
+    .profile-head{display:flex;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding-bottom:18px;font:10px var(--mono);text-transform:uppercase;color:var(--muted)}
+    .profile-head a{color:var(--acid)}
+    .profile-hero{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(30px,7vw,100px);align-items:center;padding:65px 0 85px}
+    .profile-photo{height:min(68vh,680px);min-height:360px;overflow:hidden;background:#20211d}
+    .profile-photo img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.8)}
+    .profile-hero h1{font-size:clamp(64px,10vw,140px);line-height:.82;letter-spacing:-.1em;margin:25px 0}
+    .profile-lead{font-size:clamp(18px,2.1vw,27px);line-height:1.55;color:#c4c2ba;max-width:700px}
+    .profile-lead strong{color:var(--paper)}
+    .profile-facts{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:42px;padding-top:25px;border-top:1px solid var(--line)}
+    .profile-fact small{display:block;font:10px var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .profile-fact span{font-size:14px;line-height:1.6}
+    .profile-block{padding:65px 0;border-top:1px solid var(--line)}
+    .profile-block-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:35px}
+    .profile-block-head h2{font-size:clamp(38px,6vw,75px);letter-spacing:-.08em;line-height:.9;margin:15px 0 0}
+    .profile-exp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    .profile-exp{border:1px solid var(--line);background:#191a17;padding:25px}
+    .profile-exp small{font:10px var(--mono);color:var(--acid);text-transform:uppercase}
+    .profile-exp h3{font-size:25px;letter-spacing:-.06em;margin:15px 0 5px}
+    .profile-exp .role{color:var(--muted);font-size:12px;margin:0 0 18px}
+    .profile-exp p,.profile-exp li{font-size:12px;line-height:1.7;color:#c4c2ba}
+    .profile-exp ul{padding-left:17px;margin:12px 0}
+    .profile-gallery{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    .profile-gallery figure{margin:0;overflow:hidden;background:#20211d}
+    .profile-gallery img{width:100%;height:100%;min-height:220px;max-height:460px;object-fit:cover;display:block}
+    .profile-gallery figcaption{font:10px var(--mono);color:var(--muted);padding:12px 0;text-transform:uppercase}
+    .profile-return{display:flex;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding-top:25px;font:10px var(--mono);text-transform:uppercase}
+    .profile-return a:last-child{color:var(--acid)}
+    @media(max-width:760px){.profile-page{padding-top:95px}.profile-hero{grid-template-columns:1fr;padding:40px 0 55px}.profile-photo{height:55vh;min-height:300px}.profile-exp-grid{grid-template-columns:1fr}.profile-gallery{grid-template-columns:1fr}.profile-gallery img{max-height:380px}.profile-block{padding:45px 0}.profile-facts{gap:18px}}
+
   </style>
 </head>
 <body class="is-loading">
@@ -53,7 +86,7 @@
     <section class="home-cards" aria-label="Accès rapides">
       <div class="home-cards-head"><span>EXPLORE LE PORTFOLIO</span><span>CHOISIS TON POINT D'ENTRÉE ↘</span></div>
       <div class="home-card-grid">
-        <a class="home-card home-card-about" href="#about"><span class="home-card-number">01 / PROFIL</span><span class="home-card-visual"><img src="My%20bike%20!.png" alt=""></span><span class="home-card-bottom"><strong>Qui suis-je ?</strong><i>↗</i></span></a>
+        <a class="home-card home-card-about" href="#profile"><span class="home-card-number">01 / PROFIL</span><span class="home-card-visual"><img src="My%20bike%20!.png" alt="Photo de Flavio" loading="eager"></span><span class="home-card-bottom"><strong>Qui suis-je ?</strong><i>↗</i></span></a>
         <a class="home-card" href="#project-zentorno" data-project="zentorno"><span class="home-card-number">02 / PROJET</span><span class="home-card-visual"><img src="image%20zentorno.PNG" alt=""></span><span class="home-card-bottom"><strong>Zentorno</strong><i>↗</i></span></a>
         <a class="home-card home-card-third" href="#project-pin" data-project="pin"><span class="home-card-number">03 / PROJET</span><span class="home-card-visual"><img src="1793454396573.jpg" alt=""></span><span class="home-card-bottom"><strong>PinTheLocation</strong><i>↗</i></span></a>
       </div>
@@ -149,7 +182,58 @@
     };
     function showExperience(key){const d=experienceData[key];if(!d)return;$('.experience-tab').forEach(b=>{const active=b.dataset.exp===key;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});$('#exp-detail-date').textContent=d.date;$('#exp-detail-place').textContent=d.place;$('#exp-detail-title').textContent=d.title;$('#exp-detail-role').textContent=d.role;$('#exp-detail-intro').textContent=d.intro;$('#exp-detail-tasks').innerHTML=d.tasks.map(t=>'<li>'+t+'</li>').join('');$('#exp-detail-outro').textContent=d.outro;$('#exp-detail-tags').innerHTML=d.tags.map(t=>'<span>'+t+'</span>').join('');}
     $('.experience-tab').forEach(b=>b.addEventListener('click',()=>showExperience(b.dataset.exp)));
+
     showExperience('mairie');
+
+    // Page profil dédiée : reprend les informations déjà présentes dans le portfolio.
+    const profilePage=document.createElement('section');
+    profilePage.id='profile-page';
+    profilePage.className='profile-page';
+    const expCards=Object.values(experienceData).map(d=>'<article class="profile-exp"><small>'+d.date+' · '+d.place+'</small><h3>'+d.title+'</h3><p class="role">'+d.role+'</p><p>'+d.intro+'</p><ul>'+d.tasks.map(t=>'<li>'+t+'</li>').join('')+'</ul><p>'+d.outro+'</p><div class="detail-tags">'+d.tags.map(t=>'<span>'+t+'</span>').join('')+'</div></article>').join('');
+    profilePage.innerHTML=`
+      <div class="profile-head"><a href="#top" id="profile-back">← Retour à l'accueil</a><span>FLAVIO RUDI / À PROPOS</span></div>
+      <div class="profile-hero">
+        <div class="profile-photo"><img src="My%20bike%20!.png" alt="Photo de Flavio Rudi"></div>
+        <div>
+          <div class="eyebrow">01 / QUI SUIS-JE ?</div>
+          <h1>Flavio<br>Rudi<span style="color:var(--acid)">.</span></h1>
+          <p class="profile-lead">Je suis <strong>Flavio Rudi</strong>, étudiant en troisième année de BUT Techniques de Commercialisation. J'aime comprendre comment les choses fonctionnent, trouver le bon angle et transformer une intuition en projet concret.</p>
+          <p class="profile-lead">Du marketing digital à la création de contenus, en passant par le développement d'un produit web, je cultive une approche <strong>transversale, créative et orientée expérience.</strong></p>
+          <div class="profile-facts">
+            <div class="profile-fact"><small>Formation</small><span>BUT Techniques de Commercialisation<br>3e année</span></div>
+            <div class="profile-fact"><small>Localisation</small><span>Cannes · Côte d'Azur<br>France</span></div>
+            <div class="profile-fact"><small>Langues</small><span>Français · Anglais C1</span></div>
+            <div class="profile-fact"><small>Ce qui m'anime</small><span>Digital, stratégie, création et découverte</span></div>
+          </div>
+        </div>
+      </div>
+      <section class="profile-block">
+        <div class="profile-block-head"><div><div class="eyebrow">02 / EXPÉRIENCES</div><h2>Apprendre<br>sur le terrain<span style="color:var(--acid)">.</span></h2></div><span class="section-index">Mon parcours professionnel</span></div>
+        <div class="profile-exp-grid">${expCards}</div>
+      </section>
+      <section class="profile-block">
+        <div class="profile-block-head"><div><div class="eyebrow">03 / SAVOIR-FAIRE</div><h2>Mes outils<br>& terrains<span style="color:var(--acid)">.</span></h2></div><span class="section-index">Compétences en évolution</span></div>
+        <div class="skills">
+          <div class="skill-col"><h3>Digital & analyse</h3><div class="skill-list"><span>Google Analytics</span><span>Search Console</span><span>SEO</span><span>Power BI — formation</span><span>Marketing digital</span><span>Acquisition</span></div></div>
+          <div class="skill-col"><h3>Création & stratégie</h3><div class="skill-list"><span>Création de contenu</span><span>Reels & Stories</span><span>Communication</span><span>Stratégie marketing</span><span>Gestion de projet</span><span>Expérience utilisateur</span></div></div>
+        </div>
+      </section>
+      <section class="profile-block">
+        <div class="profile-block-head"><div><div class="eyebrow">04 / EN IMAGES</div><h2>Quelques projets<br>qui me ressemblent<span style="color:var(--acid)">.</span></h2></div></div>
+        <div class="profile-gallery">
+          <figure><img src="image%20zentorno.PNG" alt="Projet Zentorno"><figcaption>Zentorno — stratégie marketing & projet d'équipe</figcaption></figure>
+          <figure><img src="1793454396573.jpg" alt="Projet PinTheLocation"><figcaption>PinTheLocation — création d'un jeu web</figcaption></figure>
+        </div>
+      </section>
+      <div class="profile-return"><a href="#top" id="profile-return-home">← Revenir au portfolio</a><a href="#contact" id="profile-contact">Me contacter ↗</a></div>`;
+    document.querySelector('main').appendChild(profilePage);
+    function openProfile(){profilePage.classList.add('visible');document.body.classList.add('profile-open');history.pushState({profile:true},'','#profile');window.scrollTo({top:0,behavior:'smooth'});}
+    function closeProfile(){profilePage.classList.remove('visible');document.body.classList.remove('profile-open');}
+    $('.home-card-about').addEventListener('click',e=>{e.preventDefault();openProfile();});
+    $('#profile-back').addEventListener('click',e=>{e.preventDefault();closeProfile();history.pushState({},'','#top');});
+    $('#profile-return-home').addEventListener('click',e=>{e.preventDefault();closeProfile();history.pushState({},'','#top');});
+    $('#profile-contact').addEventListener('click',e=>{e.preventDefault();closeProfile();history.pushState({},'','#contact');document.querySelector('#contact').scrollIntoView({behavior:'smooth'});});
+
         const projects={
       zentorno:{kicker:'01 / Projet universitaire · 2026',title:'Zentorno',img:'image%20zentorno.PNG',body:'<p>Dans le cadre de notre SAÉ marketing, nous avons imaginé et développé Zentorno, une start-up innovante dans la mobilité. Notre équipe a remporté le jeu de simulation d’entreprise.</p><p>Le projet réunissait définition d’une stratégie de marché, mise en avant de trois produits (Scooter A, B et C), différenciation concurrentielle et production d’une vidéo stratégique de cinq minutes présentant notre vision, nos résultats et notre ambition.</p><p><strong>Terrains explorés :</strong> marketing, communication, stratégie business et gestion de projet.</p>'},
       pin:{kicker:'02 / Projet personnel · 2025—2026',title:'PinTheLocation',img:'1793454396573.jpg',body:'<p>Conception et développement de PinTheLocation, un jeu géographique en ligne dont le concept repose sur la découverte et l’identification de lieux à partir d’indices.</p><p>Le projet couvre la conception du concept et de l’expérience utilisateur, la création d’un jeu interactif, un globe terrestre et un système d’indices, une approche multilingue (français et anglais), ainsi qu’une réflexion sur la fidélisation, le SEO et l’acquisition de trafic.</p><p><strong>Terrains explorés :</strong> création de sites web, entrepreneuriat digital, expérience utilisateur et acquisition.</p>'}
@@ -162,7 +246,7 @@
     function closeProject(){projectPage.classList.remove('visible');document.body.classList.remove('project-open');if(location.hash.startsWith('#project-'))history.pushState({},'', '#works');}
     $('#project-back').addEventListener('click',e=>{e.preventDefault();closeProject();});
     $('.work-card').forEach(card=>{card.addEventListener('click',()=>openProject(card.dataset.project));card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openProject(card.dataset.project);}});});
-    addEventListener('popstate',()=>{if(!location.hash.startsWith('#project-')){projectPage.classList.remove('visible');document.body.classList.remove('project-open');}});
+    addEventListener('popstate',()=>{if(!location.hash.startsWith('#project-')){projectPage.classList.remove('visible');document.body.classList.remove('project-open');}if(location.hash!=='#profile'){profilePage.classList.remove('visible');document.body.classList.remove('profile-open');}});
     
   })();
   </script>
