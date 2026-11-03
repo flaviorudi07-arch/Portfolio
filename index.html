@@ -195,8 +195,8 @@
       dgfip:{date:"JUILLET 2025",place:"DRAGUIGNAN",title:"DGFiP",role:"Comptable vacataire",intro:"Au sein de la Direction générale des Finances publiques, j'ai assuré plusieurs missions administratives et comptables :",tasks:["Responsabilité de la comptabilité du service.","Gestion de tout le courrier.","Accueil et prise de rendez-vous au guichet."],outro:"Cette expérience m'a permis de développer mon autonomie, ma rigueur et mon sens de l'organisation dans un environnement administratif.",tags:["Microsoft Excel","Comptabilité","Rigueur","Gestion administrative"]},
       nespresso:{date:"JANVIER — FÉVRIER 2025",place:"CANNES",title:"Nestlé Nespresso SA",role:"Vendeur (spécialiste café)",intro:"Le premier poste que j'ai occupé est celui de l'accueil. Étant le premier contact avec les clients, j'ai appris à être le plus avenant et accueillant.",tasks:["Les managers m'ont fait confiance très rapidement et m'ont formé pour devenir expert café.","Conseil et accompagnement des clients dans leur découverte des produits.","Mise en pratique des techniques de vente et participation à l'expérience en boutique."],outro:"En plus des techniques de vente, ce stage m'a aidé à développer mes capacités relationnelles telles que l'écoute active, le travail en équipe et la gestion du stress.",tags:["Vente & Accueil","Écoute active","Gestion du stress","Travail en équipe"]}
     };
-    function showExperience(key){const d=experienceData[key];if(!d)return;$('.experience-tab').forEach(b=>{const active=b.dataset.exp===key;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});$('#exp-detail-date').textContent=d.date;$('#exp-detail-place').textContent=d.place;$('#exp-detail-title').textContent=d.title;$('#exp-detail-role').textContent=d.role;$('#exp-detail-intro').textContent=d.intro;$('#exp-detail-tasks').innerHTML=d.tasks.map(t=>'<li>'+t+'</li>').join('');$('#exp-detail-outro').textContent=d.outro;$('#exp-detail-tags').innerHTML=d.tags.map(t=>'<span>'+t+'</span>').join('');}
-    $('.experience-tab').forEach(b=>b.addEventListener('click',()=>showExperience(b.dataset.exp)));
+    function showExperience(key){const d=experienceData[key];if(!d)return;$$('.experience-tab').forEach(b=>{const active=b.dataset.exp===key;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});$('#exp-detail-date').textContent=d.date;$('#exp-detail-place').textContent=d.place;$('#exp-detail-title').textContent=d.title;$('#exp-detail-role').textContent=d.role;$('#exp-detail-intro').textContent=d.intro;$('#exp-detail-tasks').innerHTML=d.tasks.map(t=>'<li>'+t+'</li>').join('');$('#exp-detail-outro').textContent=d.outro;$('#exp-detail-tags').innerHTML=d.tags.map(t=>'<span>'+t+'</span>').join('');}
+    $$('.experience-tab').forEach(b=>b.addEventListener('click',()=>showExperience(b.dataset.exp)));
 
     showExperience('mairie');
 
@@ -260,12 +260,12 @@
     function openProject(key){const p=projectDetails[key];if(!p)return;$('#page-kicker').textContent=p.kicker;$('#page-title').textContent=p.title;$('#page-img').src=p.img;$('#page-img').alt=p.title;$('#page-copy').innerHTML=p.body;projectPage.classList.add('visible');document.body.classList.add('project-open');history.pushState({project:key},'', '#project-'+key);window.scrollTo({top:0,behavior:'smooth'});}
     function closeProject(){projectPage.classList.remove('visible');document.body.classList.remove('project-open');if(location.hash.startsWith('#project-'))history.pushState({},'', '#works');}
     $('#project-back').addEventListener('click',e=>{e.preventDefault();closeProject();});
-    $('.work-card').forEach(card=>{card.addEventListener('click',()=>openProject(card.dataset.project));card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openProject(card.dataset.project);}});});
-    $('[data-project]').forEach(card=>{
+    $$('.work-card').forEach(card=>{card.addEventListener('click',()=>openProject(card.dataset.project));card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openProject(card.dataset.project);}});});
+    $$('[data-project]').forEach(card=>{
       if(card.classList.contains('work-card'))return;
       card.addEventListener('click',e=>{e.preventDefault();openProject(card.dataset.project);});
     });
-    $('.project-page-next a').forEach(link=>link.addEventListener('click',e=>{
+    $$('.project-page-next a').forEach(link=>link.addEventListener('click',e=>{
       e.preventDefault();
       if(link.textContent.includes('Tous les projets'))closeProject();
       else {closeProject();$('#contact').scrollIntoView({behavior:'smooth'});}
