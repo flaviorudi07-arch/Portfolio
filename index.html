@@ -63,6 +63,21 @@
     .profile-return a:last-child{color:var(--acid)}
     @media(max-width:760px){.profile-page{padding-top:95px}.profile-hero{grid-template-columns:1fr;padding:40px 0 55px}.profile-photo{height:55vh;min-height:300px}.profile-exp-grid{grid-template-columns:1fr}.profile-gallery{grid-template-columns:1fr}.profile-gallery img{max-height:380px}.profile-block{padding:45px 0}.profile-facts{gap:18px}}
 
+  
+    @media(min-width:761px){
+      .hero{min-height:64svh;padding-top:125px;padding-bottom:28px}
+      .hero-main{margin:4vh 0 3vh}
+      .hero h1{font-size:clamp(70px,11.5vw,172px)}
+      .home-cards{padding-top:18px;padding-bottom:75px}
+      .home-card-visual{aspect-ratio:1.75}
+    }
+    @media(max-width:760px){
+      .hero{min-height:76svh;padding-top:115px;padding-bottom:28px}
+      .hero-main{margin:5vh 0 4vh}
+      .home-cards{padding-top:18px}
+      .home-card-visual{aspect-ratio:1.8}
+    }
+
   </style>
 </head>
 <body class="is-loading">
@@ -246,6 +261,16 @@
     function closeProject(){projectPage.classList.remove('visible');document.body.classList.remove('project-open');if(location.hash.startsWith('#project-'))history.pushState({},'', '#works');}
     $('#project-back').addEventListener('click',e=>{e.preventDefault();closeProject();});
     $('.work-card').forEach(card=>{card.addEventListener('click',()=>openProject(card.dataset.project));card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openProject(card.dataset.project);}});});
+    $('[data-project]').forEach(card=>{
+      if(card.classList.contains('work-card'))return;
+      card.addEventListener('click',e=>{e.preventDefault();openProject(card.dataset.project);});
+    });
+    $('.project-page-next a').forEach(link=>link.addEventListener('click',e=>{
+      e.preventDefault();
+      if(link.textContent.includes('Tous les projets'))closeProject();
+      else {closeProject();$('#contact').scrollIntoView({behavior:'smooth'});}
+    }));
+
     addEventListener('popstate',()=>{if(!location.hash.startsWith('#project-')){projectPage.classList.remove('visible');document.body.classList.remove('project-open');}if(location.hash!=='#profile'){profilePage.classList.remove('visible');document.body.classList.remove('profile-open');}});
     
   })();
