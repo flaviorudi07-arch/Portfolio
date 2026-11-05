@@ -275,8 +275,8 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
 .ints{display:flex;gap:10px;height:min(74vh,660px);margin-top:clamp(44px,6vw,88px)}
 .int{position:relative;flex:1 1 0;min-width:0;overflow:hidden;padding:clamp(20px,2.4vw,34px);display:flex;flex-direction:column;justify-content:flex-end;transition:flex-grow .85s var(--ease)}
 .int.on{flex-grow:5}
-.int--travel{background:var(--sky);color:var(--umber)}
-.int--biz{background:var(--umber-2);color:var(--chalk)}
+.int--travel{background:var(--umber-2);color:var(--chalk)}
+.int--biz{background:var(--sky);color:var(--umber)}
 .int--f1{background:var(--ochre);color:var(--umber)}
 .int--piano{background:var(--chalk);color:var(--umber)}
 .int-v{position:absolute;left:clamp(16px,1.8vw,26px);bottom:clamp(20px,2.4vw,34px);writing-mode:vertical-rl;transform:rotate(180deg);font-size:clamp(28px,3.2vw,50px);line-height:1;letter-spacing:-.02em;white-space:nowrap;font-variation-settings:"wdth" 112,"wght" 800;transition:opacity .35s}
@@ -294,7 +294,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
 .key.bk.down{background:var(--ochre);border-color:var(--umber)}
 .keys-note{margin:12px 0 0;font-size:16px;opacity:.8}
 
-/* Pays visités */
+/* Pays visités (Map) - ajustements pour la vue détaillée */
 .world{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,5vw,96px);align-items:center}
 .count{margin:0;font-size:clamp(110px,18vw,300px);line-height:.8;letter-spacing:-.05em;font-variation-settings:"wdth" 125,"wght" 900}
 .world h2{margin:22px 0 0;font-family:var(--f-display);font-size:clamp(24px,2.6vw,38px);font-variation-settings:"wdth" 108,"wght" 700;letter-spacing:-.015em}
@@ -551,14 +551,14 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
           <ul class="tags"><li>Curiosité</li><li>Adaptabilité</li><li>Analyse</li><li>Stratégie</li></ul>
         </div>
         <div class="p-media">
-          <div class="win" style="--ar:1846/1230" data-label="Qui suis-je ?"><img src="My bike 21!.png" alt="Photo de profil : une personne assise face à un village dans le désert, à la lumière du soir" loading="lazy" decoding="async" onerror="imgFail(this)"></div>
+          <div class="win" style="--ar:1846/1230" data-label="Qui suis-je ?"><img src="photo_profil_panel.jpg" alt="Photo de profil : une personne assise face à un village dans le désert, à la lumière du soir" loading="lazy" decoding="async" onerror="imgFail(this)"></div>
           <span class="orb" aria-hidden="true">Ouvrir</span>
         </div>
         <a class="p-link" href="#/profil" data-cursor="Ouvrir"><span class="sr">Ouvrir : Qui suis-je ?</span></a>
       </div>
     </article>
 
-    <article class="panel" data-nav="dark" style="--bg:#000;--fg:var(--chalk);--orb:var(--ochre);--orbfg:var(--umber)">
+    <article class="panel" data-nav="dark" style="--bg:#5C3A21;--fg:var(--chalk);--orb:var(--ochre);--orbfg:var(--umber)">
       <div class="panel-in">
         <div class="p-text">
           <p class="kicker">Universitaire</p>
@@ -567,14 +567,14 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
           <ul class="tags"><li>Marketing</li><li>Communication</li><li>Stratégie</li><li>Business</li><li>Gestion de projet</li></ul>
         </div>
         <div class="p-media">
-          <div class="win" style="--ar:692/379" data-label="Zentorno"><img src="image zentorno.PNG" alt="Visuel Zentorno : le nom répété en lettres contour sur fond noir" loading="lazy" decoding="async" onerror="imgFail(this)"></div>
+          <div class="win" style="--ar:692/379" data-label="Zentorno"><img src="photo_zentorno_panel.jpg" alt="Visuel Zentorno : le nom répété en lettres contour sur fond noir" loading="lazy" decoding="async" onerror="imgFail(this)"></div>
           <span class="orb" aria-hidden="true">Ouvrir</span>
         </div>
         <a class="p-link" href="#/zentorno" data-cursor="Ouvrir"><span class="sr">Ouvrir : Projet Zentorno</span></a>
       </div>
     </article>
 
-    <article class="panel" data-nav="dark" style="--bg:#0B0F1C;--fg:var(--chalk);--orb:var(--ochre);--orbfg:var(--umber)">
+    <article class="panel" data-nav="light" style="--bg:var(--sky);--fg:var(--umber);--orb:var(--umber);--orbfg:var(--chalk)">
       <div class="panel-in">
         <div class="p-text">
           <p class="kicker">Personnel</p>
@@ -583,7 +583,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
           <ul class="tags"><li>Création de sites web</li><li>SEO (Optimisation moteurs)</li><li>Entrepreneuriat digital</li><li>Acquisition de trafic</li></ul>
         </div>
         <div class="p-media">
-          <div class="win" style="--ar:913/473" data-label="PinTheLocation"><img src="1793454396573.jpg" alt="Capture de PinTheLocation : le titre Pin the Location et le bouton Jouer au challenge du jour" loading="lazy" decoding="async" onerror="imgFail(this)"></div>
+          <div class="win" style="--ar:913/473" data-label="PinTheLocation"><img src="photo_pinthelocation_panel.jpg" alt="Capture de PinTheLocation : le titre Pin the Location et le bouton Jouer au challenge du jour" loading="lazy" decoding="async" onerror="imgFail(this)"></div>
           <span class="orb" aria-hidden="true">Ouvrir</span>
         </div>
         <a class="p-link" href="#/pinthelocation" data-cursor="Ouvrir"><span class="sr">Ouvrir : PinTheLocation</span></a>
@@ -653,6 +653,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
         <div class="xp-body" id="xp-1" role="region" aria-labelledby="xp-1-b"><div class="xp-inner"><div class="xp-grid">
           <p class="xp-meta">Cannes</p>
           <div class="xp-text">
+            <img src="photo_exp_mairie_cannes.jpg" alt="Illustration de l'expérience" style="width: 100%; border-radius: 8px; margin-bottom: 20px; object-fit: cover;" loading="lazy">
             <p>Au sein des établissements culturels de la Ville de Cannes, j'assure différentes missions liées à l'accueil du public et au bon fonctionnement des espaces :</p>
             <ul class="dl">
               <li>Accueil, information et orientation des visiteurs.</li>
@@ -676,6 +677,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
         <div class="xp-body" id="xp-2" role="region" aria-labelledby="xp-2-b"><div class="xp-inner"><div class="xp-grid">
           <p class="xp-meta">Fréjus</p>
           <div class="xp-text">
+            <img src="photo_exp_metro_frejus.jpg" alt="Illustration de l'expérience" style="width: 100%; border-radius: 8px; margin-bottom: 20px; object-fit: cover;" loading="lazy">
             <p>Au sein des Halles METRO de Fréjus, j'ai occupé le poste de préparateur de commandes pendant un mois, avec pour principales missions :</p>
             <ul class="dl">
               <li>Préparation et rassemblement des commandes clients dans le respect des références et des quantités demandées.</li>
@@ -699,6 +701,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
         <div class="xp-body" id="xp-3" role="region" aria-labelledby="xp-3-b"><div class="xp-inner"><div class="xp-grid">
           <p class="xp-meta">Golfe-Juan</p>
           <div class="xp-text">
+            <img src="photo_exp_opale_marine.jpg" alt="Illustration de l'expérience" style="width: 100%; border-radius: 8px; margin-bottom: 20px; object-fit: cover;" loading="lazy">
             <p>Dans le cadre de mon stage au sein d'Opale Marine, entreprise spécialisée dans la commercialisation de bateaux, j'ai participé au développement de sa communication et de sa présence digitale. Mes principales missions :</p>
             <ul class="dl">
               <li>Création et développement de la présence de l'entreprise sur les réseaux sociaux (Instagram, Facebook et LinkedIn).</li>
@@ -722,6 +725,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
         <div class="xp-body" id="xp-4" role="region" aria-labelledby="xp-4-b"><div class="xp-inner"><div class="xp-grid">
           <p class="xp-meta">Draguignan</p>
           <div class="xp-text">
+            <img src="photo_exp_dgfip.jpg" alt="Illustration de l'expérience" style="width: 100%; border-radius: 8px; margin-bottom: 20px; object-fit: cover;" loading="lazy">
             <ul class="dl">
               <li>Responsabilité de la comptabilité du service.</li>
               <li>Gestion de tout le courrier.</li>
@@ -741,6 +745,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
         <div class="xp-body" id="xp-5" role="region" aria-labelledby="xp-5-b"><div class="xp-inner"><div class="xp-grid">
           <p class="xp-meta">Cannes</p>
           <div class="xp-text">
+            <img src="photo_exp_nespresso.jpg" alt="Illustration de l'expérience" style="width: 100%; border-radius: 8px; margin-bottom: 20px; object-fit: cover;" loading="lazy">
             <p>Le premier poste que j'ai occupé est celui de l'accueil. Étant le premier contact avec les clients, j'ai appris à être le plus avenant et accueillant.</p>
             <p>Les managers m'ont fait confiance très rapidement et m'ont formé pour devenir expert café.</p>
             <p>En plus des techniques de vente, ce stage m'a aidé à développer mes capacités relationnelles telles que l'écoute active, le travail en équipe et la gestion du stress.</p>
@@ -782,6 +787,36 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
           <div class="meter" aria-hidden="true"><b class="on"><i></i></b><b class="on"><i></i></b><b class="on"><i></i></b><b></b><b></b></div>
         </div>
       </div>
+      
+      <!-- NOUVEAU : Hard Skills -->
+      <div class="sk-group">
+        <h3>Hard Skills</h3>
+        <ul class="tags" style="margin-top: 15px;">
+          <li>Analyse commerciale</li>
+          <li>Stratégie marketing</li>
+          <li>Marketing digital</li>
+          <li>Analyse de marché</li>
+          <li>Community management</li>
+          <li>Développement commercial</li>
+          <li>SEO</li>
+          <li>Gestion de projet</li>
+        </ul>
+      </div>
+
+      <!-- NOUVEAU : Soft Skills & Savoir-être -->
+      <div class="sk-group">
+        <h3>Soft Skills &amp; Savoir-être</h3>
+        <ul class="tags" style="margin-top: 15px;">
+          <li>Adaptabilité</li>
+          <li>Esprit analytique</li>
+          <li>Polyvalence</li>
+          <li>Autonomie</li>
+          <li>Organisation</li>
+          <li>Travail en équipe</li>
+          <li>Résolution de problèmes</li>
+          <li>Communication</li>
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -791,11 +826,11 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
     <div class="ints">
       <div class="int int--travel on" tabindex="0" aria-label="Voyages">
         <span class="int-v" aria-hidden="true">Voyages</span>
-        <div class="int-h"><h3>Voyages</h3><p>Découvrir d'autres marchés, d'autres habitudes de consommation.</p><a class="btn sm" href="#/voyages" style="--fg:#1B120D;--fill:#1B120D;--on:#E09A3E">Voir la page</a></div>
+        <div class="int-h"><h3>Voyages</h3><p>Découvrir d'autres marchés, d'autres habitudes de consommation.</p><a class="btn sm" href="#/voyages">Voir la page</a></div>
       </div>
       <div class="int int--biz" tabindex="0" aria-label="Business">
         <span class="int-v" aria-hidden="true">Business</span>
-        <div class="int-h"><h3>Business</h3><p>Analyser comment les entreprises défendent leur position.</p><a class="btn sm" href="#/business">Voir la page</a></div>
+        <div class="int-h"><h3>Business</h3><p>Analyser comment les entreprises défendent leur position.</p><a class="btn sm" href="#/business" style="--fg:#1B120D;--fill:#1B120D;--on:#E09A3E">Voir la page</a></div>
       </div>
       <div class="int int--f1" tabindex="0" aria-label="Automobile / F1">
         <span class="int-v" aria-hidden="true">Automobile / F1</span>
@@ -823,37 +858,6 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
           </div>
           <p class="keys-note">Essayez quelques notes.</p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ PAYS VISITÉS ============ -->
-  <section class="sec" id="monde" data-nav="dark" style="padding-top:0">
-    <div class="world">
-      <div>
-        <p class="count"><span class="num" data-count="15">15</span></p>
-        <h2>Pays visités</h2>
-        <ul class="chips">
-          <li><button class="chip" type="button" data-i="0">France</button></li>
-          <li><button class="chip" type="button" data-i="1">Espagne</button></li>
-          <li><button class="chip" type="button" data-i="2">Italie</button></li>
-          <li><button class="chip" type="button" data-i="3">Suisse</button></li>
-          <li><button class="chip" type="button" data-i="4">Allemagne</button></li>
-          <li><button class="chip" type="button" data-i="5">Maroc</button></li>
-          <li><button class="chip" type="button" data-i="6">Suède</button></li>
-          <li><button class="chip" type="button" data-i="7">Pologne</button></li>
-          <li><button class="chip" type="button" data-i="8">Hongrie</button></li>
-          <li><button class="chip" type="button" data-i="9">Roumanie</button></li>
-          <li><button class="chip" type="button" data-i="10">Bulgarie</button></li>
-          <li><button class="chip" type="button" data-i="11">Albanie</button></li>
-          <li><button class="chip" type="button" data-i="12">Malte</button></li>
-          <li><button class="chip" type="button" data-i="13">Danemark</button></li>
-          <li><button class="chip" type="button" data-i="14">Pays-Bas</button></li>
-        </ul>
-      </div>
-      <div class="map" id="map-wrap">
-        <canvas id="map" role="img" aria-label="Carte de l'Europe et du Maroc : les 15 pays visités sont mis en évidence"></canvas>
-        <div class="map-tip" id="map-tip"></div>
       </div>
     </div>
   </section>
@@ -890,9 +894,9 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
     </header>
 
     <div class="mood">
-      <figure class="m1 v-clip"><img src="My%20bike%20%21.png" alt="Photo de profil : une personne assise face à un village dans le désert, à la lumière du soir" decoding="async" onerror="imgFail(this)"></figure>
+      <figure class="m1 v-clip"><img src="photo_profil_detail_1.jpg" alt="Photo de profil : une personne assise face à un village dans le désert, à la lumière du soir" decoding="async" onerror="imgFail(this)"></figure>
       <p class="quote v-fade">J'aime apprendre, comprendre et donner du sens aux projets auxquels je participe.</p>
-      <figure class="m3 v-clip"><img src="My%20bike%20%21.png" alt="" decoding="async" onerror="imgFail(this)"></figure>
+      <figure class="m3 v-clip"><img src="photo_profil_detail_2.jpg" alt="Seconde photo de profil" decoding="async" onerror="imgFail(this)"></figure>
     </div>
 
     <div class="v-grid">
@@ -930,7 +934,8 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
   </div>
 </section>
 
-<section class="view" id="view-voyages" data-view="voyages" role="dialog" aria-modal="true" aria-labelledby="vt-voyages" style="--vbg:var(--sky);--vfg:var(--umber)" inert>
+<!-- MAP DÉPLACÉE ICI -->
+<section class="view" id="view-voyages" data-view="voyages" role="dialog" aria-modal="true" aria-labelledby="vt-voyages" style="--vbg:var(--umber-2);--vfg:var(--chalk)" inert>
   <div class="v-bar"><a class="logo" href="#top" aria-label="Retour à l'accueil">FR.</a><button class="back" type="button"><span class="chev" aria-hidden="true"></span>Retour à l'accueil</button></div>
   <div class="v-wrap">
     <header class="v-head">
@@ -938,12 +943,40 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
       <h1 class="v-title" id="vt-voyages"><span class="v-line"><span>Voyages</span></span></h1>
       <p class="v-sub v-fade">Découvrir d'autres marchés, d'autres habitudes de consommation.</p>
     </header>
-    <div class="v-grid"><div class="v-text v-fade"><p class="win-badge">15 pays visités</p><p>Chaque voyage est l'occasion d'observer d'autres marchés et d'autres habitudes de consommation.</p></div><div class="v-text v-fade"><ul class="tags v-tags"><li>France</li><li>Espagne</li><li>Italie</li><li>Suisse</li><li>Allemagne</li><li>Maroc</li><li>Suède</li><li>Pologne</li><li>Hongrie</li><li>Roumanie</li><li>Bulgarie</li><li>Albanie</li><li>Malte</li><li>Danemark</li><li>Pays-Bas</li></ul></div></div>
+    
+    <div class="world v-fade" style="margin-bottom: 60px;">
+      <div>
+        <p class="count"><span class="num" data-count="15">15</span></p>
+        <h2>Pays visités</h2>
+        <ul class="chips">
+          <li><button class="chip" type="button" data-i="0">France</button></li>
+          <li><button class="chip" type="button" data-i="1">Espagne</button></li>
+          <li><button class="chip" type="button" data-i="2">Italie</button></li>
+          <li><button class="chip" type="button" data-i="3">Suisse</button></li>
+          <li><button class="chip" type="button" data-i="4">Allemagne</button></li>
+          <li><button class="chip" type="button" data-i="5">Maroc</button></li>
+          <li><button class="chip" type="button" data-i="6">Suède</button></li>
+          <li><button class="chip" type="button" data-i="7">Pologne</button></li>
+          <li><button class="chip" type="button" data-i="8">Hongrie</button></li>
+          <li><button class="chip" type="button" data-i="9">Roumanie</button></li>
+          <li><button class="chip" type="button" data-i="10">Bulgarie</button></li>
+          <li><button class="chip" type="button" data-i="11">Albanie</button></li>
+          <li><button class="chip" type="button" data-i="12">Malte</button></li>
+          <li><button class="chip" type="button" data-i="13">Danemark</button></li>
+          <li><button class="chip" type="button" data-i="14">Pays-Bas</button></li>
+        </ul>
+      </div>
+      <div class="map" id="map-wrap">
+        <canvas id="map" role="img" aria-label="Carte de l'Europe et du Maroc : les 15 pays visités sont mis en évidence"></canvas>
+        <div class="map-tip" id="map-tip"></div>
+      </div>
+    </div>
+
     <a class="next" href="#/business"><p class="kicker">Page suivante</p><span class="next-t">Business</span></a>
   </div>
 </section>
 
-<section class="view" id="view-business" data-view="business" role="dialog" aria-modal="true" aria-labelledby="vt-business" style="--vbg:var(--umber-2);--vfg:var(--chalk)" inert>
+<section class="view" id="view-business" data-view="business" role="dialog" aria-modal="true" aria-labelledby="vt-business" style="--vbg:var(--sky);--vfg:var(--umber)" inert>
   <div class="v-bar"><a class="logo" href="#top" aria-label="Retour à l'accueil">FR.</a><button class="back" type="button"><span class="chev" aria-hidden="true"></span>Retour à l'accueil</button></div>
   <div class="v-wrap">
     <header class="v-head">
@@ -979,7 +1012,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
     </header>
 
     <div class="v-grid">
-      <figure class="v-fig v-clip" style="--ar:692/379" data-label="Zentorno"><img src="image%20zentorno.PNG" alt="Visuel Zentorno : le nom répété en lettres contour sur fond noir" decoding="async" onerror="imgFail(this)"></figure>
+      <figure class="v-fig v-clip" style="--ar:692/379" data-label="Zentorno"><img src="photo_zentorno_detail_top.jpg" alt="Visuel Zentorno : le nom répété en lettres contour sur fond noir" decoding="async" onerror="imgFail(this)"></figure>
       <div class="v-text v-fade">
         <p class="win-badge">Projet gagnant</p>
         <p>Dans le cadre de notre SAÉ (Situation d'Apprentissage et d'Évaluation) marketing, nous avons imaginé et développé Zentorno, une start-up innovante dans la mobilité... et nous avons remporté le jeu d'entreprise !</p>
@@ -991,6 +1024,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
           <li>Produire une vidéo stratégique de 5 minutes synthétisant vision, résultats et ambition.</li>
         </ul>
         <p>Cette victoire démontre notre capacité à innover, convaincre et exécuter avec excellence. Zentorno n'était pas seulement un projet... c'était le projet gagnant.</p>
+        <img src="photo_zentorno_detail_body.jpg" alt="Illustration Zentorno" style="width: 100%; border-radius: 8px; margin-bottom: 30px; margin-top: 15px; object-fit: cover;" loading="lazy">
         <ul class="tags v-tags"><li>Marketing</li><li>Communication</li><li>Stratégie</li><li>Business</li><li>Gestion de projet</li></ul>
       </div>
     </div>
@@ -1009,7 +1043,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
     </header>
 
     <div class="v-grid">
-      <figure class="v-fig v-clip" style="--ar:913/473" data-label="PinTheLocation"><img src="1793454396573.jpg" alt="Capture de PinTheLocation : le titre Pin the Location et le bouton Jouer au challenge du jour" decoding="async" onerror="imgFail(this)"></figure>
+      <figure class="v-fig v-clip" style="--ar:913/473" data-label="PinTheLocation"><img src="photo_pinthelocation_detail_top.jpg" alt="Capture de PinTheLocation : le titre Pin the Location et le bouton Jouer au challenge du jour" decoding="async" onerror="imgFail(this)"></figure>
       <div class="v-text v-fade">
         <p>Conception et développement de PinTheLocation, un jeu géographique en ligne dont le concept repose sur la découverte et l'identification de lieux à partir d'indices.</p>
         <h2>Principales réalisations :</h2>
@@ -1023,6 +1057,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
           <li>Étude des possibilités de monétisation et de développement du projet.</li>
         </ul>
         <p>Ce projet me permet de développer mes compétences en entrepreneuriat digital, marketing stratégique, acquisition de trafic et gestion de produit numérique, tout en travaillant sur un projet de A à Z.</p>
+        <img src="photo_pinthelocation_detail_body.jpg" alt="Illustration PinTheLocation" style="width: 100%; border-radius: 8px; margin-bottom: 30px; margin-top: 15px; object-fit: cover;" loading="lazy">
         <ul class="tags v-tags"><li>Création de sites web</li><li>SEO (Optimisation moteurs)</li><li>Entrepreneuriat digital</li><li>Acquisition de trafic</li></ul>
       </div>
     </div>
@@ -1520,7 +1555,11 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
   }
   function go(name) {
     var url = location.pathname + location.search + '#/' + name;
-    if (currentView) history.replaceState({ v: name }, '', url); else history.pushState({ v: name }, '', url);
+    try {
+      if (currentView) history.replaceState({ v: name }, '', url); else history.pushState({ v: name }, '', url);
+    } catch (e) {
+      location.hash = '#/' + name;
+    }
     route();
   }
   doc.addEventListener('click', function (e) {
@@ -1531,8 +1570,16 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
   });
   $$('.back').forEach(function (b) {
     b.addEventListener('click', function () {
-      if (history.state && history.state.v) history.back();
-      else { history.replaceState(null, '', location.pathname + location.search); route(); }
+      if (history.state && history.state.v) {
+        history.back();
+      } else { 
+        try {
+          history.replaceState(null, '', location.pathname + location.search); 
+        } catch (e) {
+          location.hash = '';
+        }
+        route(); 
+      }
     });
   });
   doc.addEventListener('keydown', function (e) {
