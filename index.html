@@ -294,7 +294,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
 .key.bk.down{background:var(--ochre);border-color:var(--umber)}
 .keys-note{margin:12px 0 0;font-size:16px;opacity:.8}
 
-/* Pays visités (Map) - ajustements pour la vue détaillée */
+/* Pays visités (Map) & Infobulle photo */
 .world{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,5vw,96px);align-items:center}
 .count{margin:0;font-size:clamp(110px,18vw,300px);line-height:.8;letter-spacing:-.05em;font-variation-settings:"wdth" 125,"wght" 900}
 .world h2{margin:22px 0 0;font-family:var(--f-display);font-size:clamp(24px,2.6vw,38px);font-variation-settings:"wdth" 108,"wght" 700;letter-spacing:-.015em}
@@ -303,8 +303,26 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
 .chip:hover,.chip.on{color:var(--ochre);border-color:var(--ochre)}
 .map{position:relative;width:100%;max-width:660px;justify-self:end;aspect-ratio:150/169}
 .map canvas{display:block;width:100%;height:100%}
-.map-tip{position:absolute;left:0;top:0;pointer-events:none;background:var(--chalk);color:var(--umber);padding:5px 12px;font-size:16px;font-variation-settings:"wdth" 96,"wght" 650;white-space:nowrap;opacity:0;transform:translate(-50%,-170%);transition:opacity .15s}
+
+/* Style de la carte/infobulle photo au survol */
+.map-tip{
+  position:absolute;left:0;top:0;pointer-events:none;background:var(--chalk);color:var(--umber);
+  padding:10px;border-radius:6px;width:190px;box-shadow:0 12px 30px rgba(0,0,0,0.35);
+  opacity:0;transform:translate(-50%,-115%);transition:opacity .2s,transform .2s;z-index:10;
+}
 .map-tip.show{opacity:1}
+.map-tip-img{
+  width:100%;aspect-ratio:16/10;background:rgba(27,18,13,.1);border-radius:4px;overflow:hidden;position:relative;margin-bottom:8px;
+}
+.map-tip-img img{width:100%;height:100%;object-fit:cover}
+.map-tip-img img.failed{display:none}
+.map-tip-img::before{
+  content:"Photo à ajouter";position:absolute;inset:0;display:grid;place-items:center;
+  font-size:11px;font-family:var(--f-display);font-weight:600;opacity:0.4;text-align:center;padding:4px;
+}
+.map-tip-name{
+  display:block;font-size:16px;font-family:var(--f-display);font-weight:800;text-align:center;letter-spacing:-.01em;
+}
 
 /* Contact */
 .contact{background:var(--ochre);color:var(--umber);padding:clamp(88px,12vw,184px) var(--gut) 36px}
@@ -387,7 +405,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
 
 /* ============================================================
    Console télémétrie
-   ============================================================ */
+  ------------------------------------------------------------ */
 .tele{
   position:fixed;right:var(--gut);bottom:20px;z-index:70;width:min(330px,calc(100vw - 2*var(--gut)));max-height:calc(100svh - 110px);overflow:auto;
   background:var(--umber-2);color:var(--chalk);border:1.5px solid rgba(240,234,223,.26);
@@ -934,7 +952,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
   </div>
 </section>
 
-<!-- MAP DÉPLACÉE ICI -->
+<!-- SECTION VOYAGES (MODIFIÉE AVEC L'INFOBULLE PHOTO) -->
 <section class="view" id="view-voyages" data-view="voyages" role="dialog" aria-modal="true" aria-labelledby="vt-voyages" style="--vbg:var(--umber-2);--vfg:var(--chalk)" inert>
   <div class="v-bar"><a class="logo" href="#top" aria-label="Retour à l'accueil">FR.</a><button class="back" type="button"><span class="chev" aria-hidden="true"></span>Retour à l'accueil</button></div>
   <div class="v-wrap">
@@ -968,7 +986,12 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
       </div>
       <div class="map" id="map-wrap">
         <canvas id="map" role="img" aria-label="Carte de l'Europe et du Maroc : les 15 pays visités sont mis en évidence"></canvas>
-        <div class="map-tip" id="map-tip"></div>
+        <div class="map-tip" id="map-tip">
+          <div class="map-tip-img">
+            <img id="map-tip-img" src="" alt="" onerror="imgFail(this)" loading="lazy">
+          </div>
+          <span class="map-tip-name" id="map-tip-name"></span>
+        </div>
       </div>
     </div>
 
@@ -1386,7 +1409,7 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
   });
 
   /* ------------------------------------------------------------
-     Carte en points des pays visités
+     Carte en points des pays visités (avec prévisualisation photo)
   ------------------------------------------------------------ */
   (function initMap() {
     var D = win.__MAP__, canvas = $('#map');
@@ -1414,6 +1437,26 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
     var base = doc.createElement('canvas'), bctx = base.getContext('2d');
     var W = 0, H = 0, dpr = 1, cs = 1;
     var tip = $('#map-tip'), wrap = $('#map-wrap');
+    var tipImg = $('#map-tip-img'), tipName = $('#map-tip-name');
+
+    /* Associez ici les noms de fichiers de vos photos par pays (dans l'ordre exact) */
+    var countryImages = [
+      "france.jpg",     /* 0: France */
+      "espagne.jpg",    /* 1: Espagne */
+      "italie.jpg",     /* 2: Italie */
+      "suisse.jpg",     /* 3: Suisse */
+      "allemagne.jpg",  /* 4: Allemagne */
+      "maroc.jpg",      /* 5: Maroc */
+      "suede.jpg",      /* 6: Suède */
+      "pologne.jpg",    /* 7: Pologne */
+      "hongrie.jpg",    /* 8: Hongrie */
+      "roumanie.jpg",   /* 9: Roumanie */
+      "bulgarie.jpg",   /* 10: Bulgarie */
+      "albanie.jpg",    /* 11: Albanie */
+      "malte.jpg",      /* 12: Malte */
+      "danemark.jpg",   /* 13: Danemark */
+      "pays-bas.jpg"    /* 14: Pays-Bas */
+    ];
 
     function rebuild() {
       W = canvas.clientWidth; H = canvas.clientHeight;
@@ -1457,7 +1500,10 @@ h1,h2,h3,h4{margin:0;font-weight:inherit}
     }
     function showTip(i, x, y) {
       if (i < 0) { tip.classList.remove('show'); return; }
-      tip.textContent = names[i];
+      tipName.textContent = names[i];
+      tipImg.classList.remove('failed');
+      tipImg.src = countryImages[i] || '';
+      tipImg.alt = "Photo de " + names[i];
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
       tip.classList.add('show');
     }
